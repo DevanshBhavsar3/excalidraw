@@ -11,7 +11,8 @@
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/ws": "^8.5.14"
+    "@types/ws": "^8.5.14",
+    "@repo/backend-common": "workspace:*"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +20,6 @@
   "type": "commonjs",
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.8",
-    "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
     "ws": "^8.18.0"
   }

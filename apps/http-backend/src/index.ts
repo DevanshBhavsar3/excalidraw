@@ -1,20 +1,17 @@
 import express from "express";
-import z from "zod";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "./config";
+import { JWT_SECRET } from "@repo/backend-common/config";
 import { authMiddleware } from "./authMiddleware";
+import { CreateUserSchema, SigninUserSchema } from "@repo/common/types";
+import prisma from "@repo/db/client";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // TODO: Sign userId as JWT payload
 
-app.post("/signup", (req, res) => {
-  const requiredBody = z.object({
-    username: z.string(),
-    password: z.string(),
-  });
-  const parsedBody = requiredBody.safeParse(req.body);
+app.post("/signup", async (req, res) => {
+  const parsedBody = CreateUserSchema.safeParse(req.body);
 
   if (!parsedBody.success) {
     res.status(400).json({ error: "Invalid Username or Password." });
@@ -23,28 +20,41 @@ app.post("/signup", (req, res) => {
 
   const body = parsedBody.data;
 
-  //   create user
-  const token = jwt.sign(body.username, JWT_SECRET);
+  const user = await prisma.user.create({
+    data: {
+      username: body.username,
+      password: body.password,
+    },
+  });
+
+  const token = jwt.sign(user.id.toString(), JWT_SECRET);
 
   res.json({ token });
 });
 
-app.post("/signin", (req, res) => {
-  const requiredBody = z.object({
-    username: z.string(),
-    password: z.string(),
-  });
-  const parsedBody = requiredBody.safeParse(req.body);
+app.post("/signin", async (req, res) => {
+  const parsedBody = SigninUserSchema.safeParse(req.body);
 
   if (!parsedBody.success) {
     res.status(400).json({ error: "Invalid Username or Password." });
     return;
   }
 
-  const body = req.body;
+  const body = parsedBody.data;
 
-  //   check for username and check password
-  const token = jwt.sign(body.username, JWT_SECRET);
+  const user = await prisma.user.findUnique({
+    where: {
+      username: body.username,
+      password: body.password,
+    },
+  });
+
+  if (!user) {
+    res.json({ error: "Invalid credentials." });
+    return;
+  }
+
+  const token = jwt.sign(user.id.toString(), JWT_SECRET);
 
   res.json({ token });
 });
