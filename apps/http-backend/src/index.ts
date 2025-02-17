@@ -1,14 +1,19 @@
+import { JWT_SECRET } from "@repo/backend-common/config";
+import {
+  CreateRoomSchema,
+  CreateUserSchema,
+  SigninUserSchema,
+} from "@repo/common/types";
+import { prisma } from "@repo/db/client";
+import bcrypt from "bcrypt";
 import express from "express";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "@repo/backend-common/config";
 import { authMiddleware } from "./authMiddleware";
-import { CreateUserSchema, SigninUserSchema } from "@repo/common/types";
-import prisma from "@repo/db/client";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// TODO: Sign userId as JWT payload
+app.use(express.json());
 
 app.post("/signup", async (req, res) => {
   const parsedBody = CreateUserSchema.safeParse(req.body);
@@ -20,16 +25,20 @@ app.post("/signup", async (req, res) => {
 
   const body = parsedBody.data;
 
-  const user = await prisma.user.create({
-    data: {
-      username: body.username,
-      password: body.password,
-    },
-  });
+  try {
+    const hashedPassword = await bcrypt.hash(body.password, 7);
+    const user = await prisma.user.create({
+      data: {
+        username: body.username,
+        password: hashedPassword,
+      },
+    });
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
 
-  const token = jwt.sign(user.id.toString(), JWT_SECRET);
-
-  res.json({ token });
+    res.json({ token });
+  } catch (e) {
+    res.status(400).json({ error: "Username already exists." });
+  }
 });
 
 app.post("/signin", async (req, res) => {
@@ -45,23 +54,73 @@ app.post("/signin", async (req, res) => {
   const user = await prisma.user.findUnique({
     where: {
       username: body.username,
-      password: body.password,
     },
   });
 
   if (!user) {
-    res.json({ error: "Invalid credentials." });
+    res.status(400).json({ error: "User doesn't exists." });
     return;
   }
 
-  const token = jwt.sign(user.id.toString(), JWT_SECRET);
+  const isCorrectPassword = await bcrypt.compare(body.password, user.password);
+  if (!isCorrectPassword) {
+    res.status(400).json({ error: "Invalid Password." });
+    return;
+  }
+
+  const token = jwt.sign({ userId: user.id }, JWT_SECRET);
 
   res.json({ token });
 });
 
-app.post("/create", authMiddleware, (req, res) => {
-  // db call
-  res.json({ roomId: 123 });
+app.post("/create", authMiddleware, async (req, res) => {
+  const parsedBody = CreateRoomSchema.safeParse(req.body);
+
+  if (!parsedBody.success) {
+    res.status(400).json({ error: "Invalid data." });
+    return;
+  }
+
+  const adminId = req.userId;
+
+  try {
+    const room = await prisma.room.create({
+      data: {
+        adminId,
+        slug: parsedBody.data.name,
+      },
+    });
+    res.json({ room });
+  } catch (e) {
+    res.json({ error: "Room already exists." });
+  }
+});
+
+app.get("/chats", authMiddleware, async (req, res) => {
+  const roomId = parseInt(req.query.roomId as string);
+
+  try {
+    const room = await prisma.room.findUnique({
+      where: {
+        id: roomId,
+      },
+    });
+
+    if (!room) {
+      res.status(400).json({ error: "Invalid room id." });
+      return;
+    }
+
+    const chats = await prisma.chat.findMany({
+      where: {
+        roomId: room.id,
+      },
+    });
+
+    res.json(chats);
+  } catch (e) {
+    res.status(400).json({ error: "Something went wrong." });
+  }
 });
 
 app.listen(PORT, () => console.log(`Server started on PORT: ${PORT}`));
