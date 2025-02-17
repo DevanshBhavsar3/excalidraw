@@ -90,7 +90,7 @@ app.post("/create", authMiddleware, async (req, res) => {
         slug: parsedBody.data.name,
       },
     });
-    res.json({ room });
+    res.json({ roomId: room.id });
   } catch (e) {
     res.json({ error: "Room already exists." });
   }
@@ -115,6 +115,10 @@ app.get("/chats", authMiddleware, async (req, res) => {
       where: {
         roomId: room.id,
       },
+      orderBy: {
+        id: "asc",
+      },
+      take: 50,
     });
 
     res.json(chats);

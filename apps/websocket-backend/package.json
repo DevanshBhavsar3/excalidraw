@@ -12,14 +12,15 @@
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/ws": "^8.5.14",
-    "@repo/backend-common": "workspace:*"
+    "@repo/backend-common": "workspace:*",
+    "@types/jsonwebtoken": "^9.0.8"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@types/jsonwebtoken": "^9.0.8",
+    "@repo/db": "workspace:*",
     "jsonwebtoken": "^9.0.2",
     "ws": "^8.18.0"
   }
