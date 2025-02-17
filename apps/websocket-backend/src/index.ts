@@ -65,7 +65,7 @@ wss.on("connection", (socket, req) => {
             { userId, ws: socket },
           ]);
         } catch (e) {
-          socket.send("Soemthing went wrong.");
+          socket.send("Something went wrong.");
           socket.close();
         }
         break;

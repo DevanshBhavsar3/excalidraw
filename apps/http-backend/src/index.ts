@@ -9,11 +9,13 @@ import bcrypt from "bcrypt";
 import express from "express";
 import jwt from "jsonwebtoken";
 import { authMiddleware } from "./authMiddleware";
+import cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
+app.use(cors());
 
 app.post("/signup", async (req, res) => {
   const parsedBody = CreateUserSchema.safeParse(req.body);
@@ -96,8 +98,8 @@ app.post("/create", authMiddleware, async (req, res) => {
   }
 });
 
-app.get("/chats", authMiddleware, async (req, res) => {
-  const roomId = parseInt(req.query.roomId as string);
+app.get("/chats/:roomId", authMiddleware, async (req, res) => {
+  const roomId = parseInt(req.params.roomId as string);
 
   try {
     const room = await prisma.room.findUnique({
@@ -115,16 +117,36 @@ app.get("/chats", authMiddleware, async (req, res) => {
       where: {
         roomId: room.id,
       },
+      select: {
+        message: true,
+      },
       orderBy: {
         id: "asc",
       },
       take: 50,
     });
 
-    res.json(chats);
+    res.json({ chats });
   } catch (e) {
     res.status(400).json({ error: "Something went wrong." });
   }
+});
+
+app.get("/room/:slug", authMiddleware, async (req, res) => {
+  const slug = req.params.slug;
+
+  const room = await prisma.room.findFirst({
+    where: {
+      slug,
+    },
+  });
+
+  if (!room) {
+    res.status(400).json({ error: "Invalid slug." });
+    return;
+  }
+
+  res.json(room);
 });
 
 app.listen(PORT, () => console.log(`Server started on PORT: ${PORT}`));
