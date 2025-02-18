@@ -14,9 +14,5 @@ export function CanvasPage({ roomId }: { roomId: number }) {
     return <div>Socket connection failed.</div>;
   }
 
-  return (
-    <div>
-      <Canvas socket={socket} roomId={roomId} />
-    </div>
-  );
+  return <Canvas socket={socket} roomId={roomId} />;
 }
