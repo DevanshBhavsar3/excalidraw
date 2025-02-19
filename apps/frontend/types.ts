@@ -4,6 +4,13 @@ export type ConfigType = {
   currentTool: Tool;
 };
 
+export enum Tools {
+  Cursor = "Cursor",
+  Rectangle = "Rectangle",
+  Circle = "Circle",
+  Line = "Line",
+}
+
 export type Rectangle = {
   kind: "rect";
   x: number;
@@ -21,13 +28,13 @@ export type Circle = {
 
 export type Line = {
   kind: "line";
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
+  x: number;
+  y: number;
+  x2: number;
+  y2: number;
 };
 
-export type Shape = Rectangle | Circle | Line;
+export type ShapeType = Rectangle | Circle | Line;
 
 export interface ResizeHandle {
   x: number;
@@ -37,3 +44,18 @@ export interface ResizeHandle {
   cursor: string;
   position: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "full";
 }
+
+export type RectangleConfig = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type Chat = {
+  id: number;
+  roomId: number;
+  message: ShapeType;
+  userId: string;
+  shape?: any;
+};

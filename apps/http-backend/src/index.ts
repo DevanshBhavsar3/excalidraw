@@ -117,12 +117,6 @@ app.get("/chats/:roomId", authMiddleware, async (req, res) => {
       where: {
         roomId: room.id,
       },
-      select: {
-        message: true,
-      },
-      orderBy: {
-        id: "asc",
-      },
       take: 50,
     });
 
