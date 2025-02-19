@@ -45,6 +45,7 @@ wss.on("connection", (socket, req) => {
 
   socket.on("message", async (data) => {
     const parsedData = JSON.parse(data.toString());
+    const users = rooms.get(parsedData.roomId) || [];
 
     switch (parsedData.type) {
       case "JOIN_ROOM":
@@ -61,7 +62,7 @@ wss.on("connection", (socket, req) => {
           }
 
           rooms.set(parsedData.roomId, [
-            ...(rooms.get(parsedData.roomId) || []),
+            ...(users || []),
             { userId, ws: socket },
           ]);
         } catch (e) {
@@ -70,48 +71,55 @@ wss.on("connection", (socket, req) => {
         }
         break;
       case "LEAVE_ROOM":
-        const existingUsers = rooms.get(parsedData.roomId) || [];
-
-        const newUsers = existingUsers.filter((user) => user.userId !== userId);
+        const newUsers = users.filter((user) => user.userId !== userId);
 
         rooms.set(parsedData.roomId, newUsers);
         break;
       case "CHAT":
-        const users = rooms.get(parsedData.roomId);
-        const message = parsedData.message;
+        const chatMessage = parsedData.message;
 
         const chat = await prisma.chat.create({
           data: {
             roomId: parsedData.roomId,
             userId,
-            message,
+            message: chatMessage,
           },
         });
 
-        if (!users) return;
-
         users.forEach((user) =>
-          user.ws.send(JSON.stringify({ type: "CHAT", chat }))
+          user.ws.send(JSON.stringify({ type: "CHAT", message: chat }))
         );
         break;
       case "UPDATE":
-        const roomUsers = rooms.get(parsedData.roomId);
-        const shape = JSON.parse(parsedData.message);
+        const updatedShape = JSON.parse(parsedData.message);
 
         const updatedChat = await prisma.chat.update({
           where: {
-            id: shape.id,
+            id: updatedShape.id,
             roomId: parsedData.roomId,
           },
           data: {
-            message: JSON.stringify(shape.shape),
+            message: JSON.stringify(updatedShape.shape),
           },
         });
 
-        if (!roomUsers) return;
-
-        roomUsers.forEach((user) =>
+        users.forEach((user) =>
           user.ws.send(JSON.stringify({ type: "UPDATE", message: updatedChat }))
+        );
+        break;
+      case "DELETE":
+        const deletedShape = JSON.parse(parsedData.message);
+        const shapeToDelete = await prisma.chat.delete({
+          where: {
+            id: deletedShape.id,
+            roomId: parsedData.roomId,
+          },
+        });
+
+        users.forEach((user) =>
+          user.ws.send(
+            JSON.stringify({ type: "DELETE", message: shapeToDelete })
+          )
         );
         break;
     }

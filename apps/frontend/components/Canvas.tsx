@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { BiRectangle, BiCircle } from "react-icons/bi";
 import { RxCursorArrow } from "react-icons/rx";
 import { TfiLayoutLineSolid } from "react-icons/tfi";
+import { AiTwotoneDelete } from "react-icons/ai";
 
 export function Canvas({
   socket,
@@ -24,6 +25,10 @@ export function Canvas({
 
       setGame(game);
       didInit.current = true;
+
+      return () => {
+        game.destroy();
+      };
     }
   }, [canvasRef, game]);
 
@@ -42,6 +47,9 @@ export function Canvas({
         </button>
         <button onClick={() => game?.setTool(Tools.Line)}>
           <TfiLayoutLineSolid size={24} />
+        </button>
+        <button onClick={() => game?.deleteShape()}>
+          <AiTwotoneDelete size={24} />
         </button>
       </div>
     </div>

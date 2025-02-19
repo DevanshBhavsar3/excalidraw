@@ -51,11 +51,3 @@ export type RectangleConfig = {
   width: number;
   height: number;
 };
-
-export type Chat = {
-  id: number;
-  roomId: number;
-  message: ShapeType;
-  userId: string;
-  shape?: any;
-};

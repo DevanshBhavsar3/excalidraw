@@ -1,8 +1,16 @@
-import { Chat, ResizeHandle, ShapeType, Tool, Tools } from "@/types";
+import { ResizeHandle, ShapeType, Tool, Tools } from "@/types";
 import { getShapes } from "./http";
 import { Rectangle } from "./Rectangle";
 import { Circle } from "./Circle";
 import { Line } from "./Line";
+
+type Chat = {
+  id: number;
+  roomId: number;
+  message: ShapeType;
+  userId: string;
+  shape?: Rectangle | Circle | Line;
+};
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -54,7 +62,7 @@ export class Game {
 
       switch (data.type) {
         case "CHAT":
-          const chatMessage = data.chat;
+          const chatMessage = data.message;
           chatMessage.message = JSON.parse(chatMessage.message);
 
           const shapeClass = this.getShapeClass(
@@ -80,6 +88,11 @@ export class Game {
             };
           }
           break;
+        case "DELETE":
+          const deleteMessage = data.message;
+
+          this.deleteShape(deleteMessage.id);
+          break;
       }
       this.clearCanvas();
     };
@@ -89,7 +102,9 @@ export class Game {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.shapes.forEach((shape) => {
-      shape.shape.draw();
+      if (shape.shape) {
+        shape.shape.draw();
+      }
     });
   }
 
@@ -130,64 +145,67 @@ export class Game {
         this.selectedShape = null;
       }
 
-      this.shapes.forEach((shape) => {
-        // find only 1 shape that is tapped by user
-        if (!this.selectedShape) {
-          if (shape.shape.isSelected(currentPos)) {
-            this.selectedShape = shape.shape;
-          }
+      const target = this.shapes.find((shape) => {
+        if (shape.shape) {
+          return shape.shape.isSelected(currentPos);
         }
       });
 
-      // @ts-ignore
-      if (this.selectedShape && this.selectedShape.checkForResize(currentPos)) {
-        this.isResizing = true;
+      if (target && target.shape) {
+        this.selectedShape = target.shape;
+
+        if (this.selectedShape.checkForResize(currentPos)) {
+          this.isResizing = true;
+        }
       }
     }
   }
 
   mouseMove(e: MouseEvent) {
+    if (!this.selectedShape) return;
     const currentPos = { x: e.clientX, y: e.clientY };
 
-    if (this.isDrawing && this.selectedShape) {
+    if (this.isDrawing || this.isResizing) {
       this.clearCanvas();
       this.selectedShape.update(this.startCoordinates, currentPos);
-    }
-
-    if (this.isResizing && this.selectedShape) {
-      this.clearCanvas();
-      this.selectedShape.update(this.startCoordinates, currentPos);
+      return;
     }
   }
 
   mouseUp(e: MouseEvent) {
-    if (this.isDrawing && this.selectedShape) {
+    if (!this.selectedShape) return;
+
+    if (this.isDrawing) {
       this.selectedShape.getProperties();
       this.sendSocketMessage("CHAT", this.selectedShape.getProperties());
-
-      this.isDrawing = false;
-      this.selectedShape = null;
     }
 
-    if (this.isResizing && this.selectedShape) {
-      this.isResizing = false;
+    if (this.isResizing) {
       this.selectedShape.closeResize();
 
-      // send shape with id
+      console.log("selected", this.selectedShape);
 
-      const shapeToUpdate = this.shapes.find(
-        (shape) => shape.id === this.selectedShape!.id
-      );
-      if (shapeToUpdate) {
-        shapeToUpdate.message = this.selectedShape.getProperties() as ShapeType;
-        this.sendSocketMessage("UPDATE", {
-          id: shapeToUpdate.id,
-          shape: shapeToUpdate.message,
-        });
-      }
+      // const shapeToUpdate = this.shapes.find(
+      //   (shape) => shape.id === this.selectedShape!.id
+      // );
+      // console.log("update", shapeToUpdate);
+      // if (shapeToUpdate) {
+      //   shapeToUpdate.message = this.selectedShape.getProperties() as ShapeType;
+      //   this.sendSocketMessage("UPDATE", {
+      //     id: shapeToUpdate.id,
+      //     shape: shapeToUpdate.message,
+      //   });
+      // }
+      this.sendSocketMessage("UPDATE", {
+        id: this.selectedShape.id,
+        shape: this.selectedShape.getProperties(),
+      });
+
       this.clearCanvas();
-      this.selectedShape = null;
     }
+
+    this.isResizing = false;
+    this.selectedShape = null;
   }
 
   mouseHandlers() {
@@ -216,7 +234,30 @@ export class Game {
     }
   }
 
+  deleteShape(id?: number) {
+    let shapeId = id || this.selectedShape?.id;
+    let shapeIndex;
+
+    shapeIndex = this.shapes.findIndex((shape) => shape.id === shapeId);
+
+    if (shapeIndex !== -1) {
+      this.sendSocketMessage("DELETE", {
+        id: shapeId,
+      });
+      this.shapes.splice(shapeIndex, 1);
+      this.selectedShape = null;
+    }
+
+    this.clearCanvas();
+  }
+
   setTool(tool: Tools) {
     this.currentTool = tool;
+  }
+
+  destroy() {
+    this.canvas.removeEventListener("mousedown", (e) => this.mouseDown(e));
+    this.canvas.removeEventListener("mousemove", (e) => this.mouseMove(e));
+    this.canvas.removeEventListener("mouseup", (e) => this.mouseUp(e));
   }
 }
