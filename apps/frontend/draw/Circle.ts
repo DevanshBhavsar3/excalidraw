@@ -1,3 +1,4 @@
+import { CircleType, ShapeType } from "@/types";
 import { Shape } from "./Shape";
 
 export class Circle extends Shape {
@@ -45,9 +46,9 @@ export class Circle extends Shape {
     this.ctx.stroke();
   }
 
-  getProperties() {
+  getProperties(): ShapeType {
     const properties = {
-      kind: "circle",
+      kind: "circle" as const,
       x: this.x,
       y: this.y,
       radius: this.radius,
@@ -56,10 +57,10 @@ export class Circle extends Shape {
     return properties;
   }
 
-  updateProperties(x: number, y: number, radius: number) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
+  updateProperties(shape: CircleType) {
+    this.x = shape.x;
+    this.y = shape.y;
+    this.radius = shape.radius;
   }
 
   isSelected(currentPos: { x: number; y: number }) {
@@ -82,30 +83,6 @@ export class Circle extends Shape {
         y: this.y,
         cursor: "move",
         position: "full",
-        width: 16,
-        height: 16,
-      },
-      {
-        x: this.x - this.radius,
-        y: this.y - this.radius,
-        cursor: "nw-resize",
-        position: "top-left",
-        width: 16,
-        height: 16,
-      },
-      {
-        x: this.x + this.radius,
-        y: this.y - this.radius,
-        cursor: "ne-resize",
-        position: "top-right",
-        width: 16,
-        height: 16,
-      },
-      {
-        x: this.x - this.radius,
-        y: this.y + this.radius,
-        cursor: "sw-resize",
-        position: "bottom-left",
         width: 16,
         height: 16,
       },

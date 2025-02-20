@@ -11,7 +11,7 @@ export enum Tools {
   Line = "Line",
 }
 
-export type Rectangle = {
+export type RectangleType = {
   kind: "rect";
   x: number;
   y: number;
@@ -19,14 +19,14 @@ export type Rectangle = {
   height: number;
 };
 
-export type Circle = {
+export type CircleType = {
   kind: "circle";
   x: number;
   y: number;
   radius: number;
 };
 
-export type Line = {
+export type LineType = {
   kind: "line";
   x: number;
   y: number;
@@ -34,7 +34,7 @@ export type Line = {
   y2: number;
 };
 
-export type ShapeType = Rectangle | Circle | Line;
+export type ShapeType = RectangleType | CircleType | LineType;
 
 export interface ResizeHandle {
   x: number;

@@ -1,4 +1,4 @@
-import { ShapeType } from "@/types";
+import { RectangleType, ShapeType } from "@/types";
 import { Shape } from "./Shape";
 
 export class Rectangle extends Shape {
@@ -81,11 +81,11 @@ export class Rectangle extends Shape {
     return properties;
   }
 
-  updateProperties(x: number, y: number, width: number, height: number) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+  updateProperties(shape: RectangleType) {
+    this.x = shape.x;
+    this.y = shape.y;
+    this.width = shape.width;
+    this.height = shape.height;
   }
 
   isSelected(currentPos: { x: number; y: number }) {

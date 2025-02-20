@@ -9,7 +9,7 @@ type Chat = {
   roomId: number;
   message: ShapeType;
   userId: string;
-  shape?: Rectangle | Circle | Line;
+  shape: Rectangle | Circle | Line;
 };
 
 export class Game {
@@ -40,7 +40,7 @@ export class Game {
     const existingShapes: Chat[] = chats;
 
     existingShapes.forEach((chat) => {
-      const shapeClass = this.getShapeClass(chat.message, chat.id);
+      const shapeClass = this.createShapeClass(chat.message, chat.id);
 
       if (shapeClass) {
         this.shapes.push({ ...chat, shape: shapeClass });
@@ -65,7 +65,7 @@ export class Game {
           const chatMessage = data.message;
           chatMessage.message = JSON.parse(chatMessage.message);
 
-          const shapeClass = this.getShapeClass(
+          const shapeClass = this.createShapeClass(
             chatMessage.message,
             chatMessage.roomId
           );
@@ -74,26 +74,33 @@ export class Game {
           break;
         case "UPDATE":
           const updateMessage = data.message;
-          const shape = JSON.parse(updateMessage.message);
+          const updatedProperties = JSON.parse(
+            updateMessage.message
+          ) as ShapeType;
 
-          const indexOfShape = this.shapes.findIndex(
+          const shapeToUpdate = this.shapes.find(
             (shape) => shape.id === updateMessage.id
           );
 
-          if (indexOfShape !== -1) {
-            const updatedShape = this.getShapeClass(shape, updateMessage.id);
-            this.shapes[indexOfShape] = {
-              ...updateMessage,
-              shape: updatedShape,
-            };
+          if (shapeToUpdate) {
+            // @ts-ignore
+            shapeToUpdate.shape.updateProperties(updatedProperties);
           }
           break;
         case "DELETE":
           const deleteMessage = data.message;
 
-          this.deleteShape(deleteMessage.id);
+          const shapeIndex = this.shapes.findIndex(
+            (shape) => shape.id === deleteMessage.id
+          );
+
+          if (shapeIndex !== -1) {
+            this.shapes.splice(shapeIndex, 1);
+          }
+
           break;
       }
+
       this.clearCanvas();
     };
   }
@@ -112,7 +119,7 @@ export class Game {
     this.socket.send(
       JSON.stringify({
         type,
-        roomId: Number(this.roomId),
+        roomId: this.roomId,
         message: JSON.stringify(message),
       })
     );
@@ -140,9 +147,9 @@ export class Game {
     } else {
       // clear selected shape if there is already one
       if (this.selectedShape) {
-        this.clearCanvas();
         this.selectedShape.closeResize();
         this.selectedShape = null;
+        this.clearCanvas();
       }
 
       const target = this.shapes.find((shape) => {
@@ -178,34 +185,24 @@ export class Game {
     if (this.isDrawing) {
       this.selectedShape.getProperties();
       this.sendSocketMessage("CHAT", this.selectedShape.getProperties());
+
+      this.isDrawing = false;
+      this.selectedShape = null;
+      return;
     }
 
     if (this.isResizing) {
       this.selectedShape.closeResize();
 
-      console.log("selected", this.selectedShape);
-
-      // const shapeToUpdate = this.shapes.find(
-      //   (shape) => shape.id === this.selectedShape!.id
-      // );
-      // console.log("update", shapeToUpdate);
-      // if (shapeToUpdate) {
-      //   shapeToUpdate.message = this.selectedShape.getProperties() as ShapeType;
-      //   this.sendSocketMessage("UPDATE", {
-      //     id: shapeToUpdate.id,
-      //     shape: shapeToUpdate.message,
-      //   });
-      // }
       this.sendSocketMessage("UPDATE", {
         id: this.selectedShape.id,
         shape: this.selectedShape.getProperties(),
       });
 
-      this.clearCanvas();
+      this.isResizing = false;
+      this.selectedShape = null;
+      return;
     }
-
-    this.isResizing = false;
-    this.selectedShape = null;
   }
 
   mouseHandlers() {
@@ -214,41 +211,34 @@ export class Game {
     this.canvas.addEventListener("mouseup", (e) => this.mouseUp(e));
   }
 
-  getShapeClass(shape: ShapeType, id: number) {
+  createShapeClass(shape: ShapeType, id: number) {
     switch (shape.kind) {
       case "rect":
         const newRect = new Rectangle(this.ctx, id);
-        newRect.updateProperties(shape.x, shape.y, shape.width, shape.height);
+        newRect.updateProperties(shape);
 
         return newRect;
       case "circle":
         const newCircle = new Circle(this.ctx, id);
-        newCircle.updateProperties(shape.x, shape.y, shape.radius);
+        newCircle.updateProperties(shape);
 
         return newCircle;
       case "line":
         const newLine = new Line(this.ctx, id);
-        newLine.updateProperties(shape.x, shape.y, shape.x2, shape.y2);
+        newLine.updateProperties(shape);
 
         return newLine;
     }
   }
 
-  deleteShape(id?: number) {
-    let shapeId = id || this.selectedShape?.id;
-    let shapeIndex;
-
-    shapeIndex = this.shapes.findIndex((shape) => shape.id === shapeId);
-
-    if (shapeIndex !== -1) {
+  deleteShape() {
+    if (this.selectedShape) {
       this.sendSocketMessage("DELETE", {
-        id: shapeId,
+        id: this.selectedShape.id,
       });
-      this.shapes.splice(shapeIndex, 1);
       this.selectedShape = null;
+      this.clearCanvas();
     }
-
-    this.clearCanvas();
   }
 
   setTool(tool: Tools) {

@@ -1,3 +1,4 @@
+import { LineType, ShapeType } from "@/types";
 import { Shape } from "./Shape";
 
 export class Line extends Shape {
@@ -55,9 +56,9 @@ export class Line extends Shape {
     this.ctx.stroke();
   }
 
-  getProperties() {
+  getProperties(): ShapeType {
     const properties = {
-      kind: "line",
+      kind: "line" as const,
       x: this.x,
       y: this.y,
       x2: this.x2,
@@ -67,11 +68,11 @@ export class Line extends Shape {
     return properties;
   }
 
-  updateProperties(x: number, y: number, x2: number, y2: number) {
-    this.x = x;
-    this.y = y;
-    this.x2 = x2;
-    this.y2 = y2;
+  updateProperties(shape: LineType) {
+    this.x = shape.x;
+    this.y = shape.y;
+    this.x2 = shape.x2;
+    this.y2 = shape.y2;
   }
 
   isSelected(currentPos: { x: number; y: number }) {

@@ -47,9 +47,9 @@ wss.on("connection", (socket, req) => {
     const parsedData = JSON.parse(data.toString());
     const users = rooms.get(parsedData.roomId) || [];
 
-    switch (parsedData.type) {
-      case "JOIN_ROOM":
-        try {
+    try {
+      switch (parsedData.type) {
+        case "JOIN_ROOM":
           const room = await prisma.room.findUnique({
             where: {
               id: parsedData.roomId,
@@ -65,63 +65,65 @@ wss.on("connection", (socket, req) => {
             ...(users || []),
             { userId, ws: socket },
           ]);
-        } catch (e) {
-          socket.send("Something went wrong.");
-          socket.close();
-        }
-        break;
-      case "LEAVE_ROOM":
-        const newUsers = users.filter((user) => user.userId !== userId);
+          break;
+        case "LEAVE_ROOM":
+          const newUsers = users.filter((user) => user.userId !== userId);
 
-        rooms.set(parsedData.roomId, newUsers);
-        break;
-      case "CHAT":
-        const chatMessage = parsedData.message;
+          rooms.set(parsedData.roomId, newUsers);
+          break;
+        case "CHAT":
+          const chatMessage = parsedData.message;
 
-        const chat = await prisma.chat.create({
-          data: {
-            roomId: parsedData.roomId,
-            userId,
-            message: chatMessage,
-          },
-        });
+          const chat = await prisma.chat.create({
+            data: {
+              roomId: parsedData.roomId,
+              userId,
+              message: chatMessage,
+            },
+          });
 
-        users.forEach((user) =>
-          user.ws.send(JSON.stringify({ type: "CHAT", message: chat }))
-        );
-        break;
-      case "UPDATE":
-        const updatedShape = JSON.parse(parsedData.message);
+          users.forEach((user) =>
+            user.ws.send(JSON.stringify({ type: "CHAT", message: chat }))
+          );
+          break;
+        case "UPDATE":
+          const updatedShape = JSON.parse(parsedData.message);
 
-        const updatedChat = await prisma.chat.update({
-          where: {
-            id: updatedShape.id,
-            roomId: parsedData.roomId,
-          },
-          data: {
-            message: JSON.stringify(updatedShape.shape),
-          },
-        });
+          const updatedChat = await prisma.chat.update({
+            where: {
+              id: updatedShape.id,
+              roomId: parsedData.roomId,
+            },
+            data: {
+              message: JSON.stringify(updatedShape.shape),
+            },
+          });
 
-        users.forEach((user) =>
-          user.ws.send(JSON.stringify({ type: "UPDATE", message: updatedChat }))
-        );
-        break;
-      case "DELETE":
-        const deletedShape = JSON.parse(parsedData.message);
-        const shapeToDelete = await prisma.chat.delete({
-          where: {
-            id: deletedShape.id,
-            roomId: parsedData.roomId,
-          },
-        });
+          users.forEach((user) =>
+            user.ws.send(
+              JSON.stringify({ type: "UPDATE", message: updatedChat })
+            )
+          );
+          break;
+        case "DELETE":
+          const deletedShape = JSON.parse(parsedData.message);
+          const shapeToDelete = await prisma.chat.delete({
+            where: {
+              id: deletedShape.id,
+              roomId: parsedData.roomId,
+            },
+          });
 
-        users.forEach((user) =>
-          user.ws.send(
-            JSON.stringify({ type: "DELETE", message: shapeToDelete })
-          )
-        );
-        break;
+          users.forEach((user) =>
+            user.ws.send(
+              JSON.stringify({ type: "DELETE", message: shapeToDelete })
+            )
+          );
+          break;
+      }
+    } catch (e) {
+      console.log(e);
+      socket.send("Failed");
     }
   });
 });
