@@ -1,15 +1,16 @@
-import { ResizeHandle, ShapeType, Tool, Tools } from "@/types";
+import { Point, ShapeType, Tools } from "@/types";
 import { getShapes } from "./http";
 import { Rectangle } from "./Rectangle";
 import { Circle } from "./Circle";
 import { Line } from "./Line";
+import { Pencil } from "./Pencil";
 
 type Chat = {
   id: number;
   roomId: number;
   message: ShapeType;
   userId: string;
-  shape: Rectangle | Circle | Line;
+  shape: Rectangle | Circle | Line | Pencil;
 };
 
 export class Game {
@@ -17,11 +18,12 @@ export class Game {
   private ctx: CanvasRenderingContext2D;
   private roomId: number;
   private shapes: Chat[] = [];
-  private startCoordinates = { x: 0, y: 0 };
+  private startCoordinates: Point = { x: 0, y: 0 };
+  private offset: Point = { x: 0, y: 0 };
   private isDrawing = false;
   private isResizing = false;
-  private selectedShape: Rectangle | Circle | Line | null = null;
-  private activeHandle: ResizeHandle | null = null;
+  private isPanning = false;
+  private selectedShape: Rectangle | Circle | Line | Pencil | null = null;
   private socket: WebSocket;
   private currentTool: Tools = Tools.Cursor;
 
@@ -52,6 +54,7 @@ export class Game {
     this.canvas.style.cursor = "default";
     this.ctx.strokeStyle = "#000000";
     this.ctx.fillStyle = "#ffffff";
+    this.ctx.lineWidth = 2;
 
     this.clearCanvas();
   }
@@ -63,12 +66,9 @@ export class Game {
       switch (data.type) {
         case "CHAT":
           const chatMessage = data.message;
-          chatMessage.message = JSON.parse(chatMessage.message);
+          const newShape = JSON.parse(chatMessage.message);
 
-          const shapeClass = this.createShapeClass(
-            chatMessage.message,
-            chatMessage.roomId
-          );
+          const shapeClass = this.createShapeClass(newShape, chatMessage.id);
 
           this.shapes.push({ ...chatMessage, shape: shapeClass });
           break;
@@ -97,8 +97,18 @@ export class Game {
           if (shapeIndex !== -1) {
             this.shapes.splice(shapeIndex, 1);
           }
-
           break;
+        case "ERROR":
+          const errorMessage = data.message;
+
+          this.ctx.font = "16px serif";
+          this.ctx.fillStyle = "#FF0000"; // Change to red for error messages
+          this.ctx.textAlign = "center";
+          this.ctx.fillText(
+            errorMessage,
+            this.canvas.width - 100,
+            this.canvas.height - 10
+          );
       }
 
       this.clearCanvas();
@@ -106,7 +116,12 @@ export class Game {
   }
 
   clearCanvas() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(
+      0 - this.offset.x,
+      0 - this.offset.y,
+      this.canvas.width,
+      this.canvas.height
+    );
 
     this.shapes.forEach((shape) => {
       if (shape.shape) {
@@ -126,12 +141,15 @@ export class Game {
   }
 
   mouseDown(e: MouseEvent) {
-    const currentPos = { x: e.clientX, y: e.clientY };
+    const currentPos = {
+      x: e.clientX - this.offset.x,
+      y: e.clientY - this.offset.y,
+    };
 
-    if (this.currentTool !== Tools.Cursor) {
+    if (this.currentTool !== Tools.Cursor && this.currentTool !== Tools.Hand) {
       this.isDrawing = true;
-      this.startCoordinates.x = e.clientX;
-      this.startCoordinates.y = e.clientY;
+      this.startCoordinates.x = e.clientX - this.offset.x;
+      this.startCoordinates.y = e.clientY - this.offset.y;
 
       switch (this.currentTool) {
         case Tools.Rectangle:
@@ -143,8 +161,18 @@ export class Game {
         case Tools.Line:
           this.selectedShape = new Line(this.ctx);
           break;
+        case Tools.Pencil:
+          this.selectedShape = new Pencil(this.ctx);
+          break;
       }
     } else {
+      if (this.currentTool === Tools.Hand) {
+        this.startCoordinates.x = e.clientX;
+        this.startCoordinates.y = e.clientY;
+        this.isPanning = true;
+        return;
+      }
+
       // clear selected shape if there is already one
       if (this.selectedShape) {
         this.selectedShape.closeResize();
@@ -161,7 +189,7 @@ export class Game {
       if (target && target.shape) {
         this.selectedShape = target.shape;
 
-        if (this.selectedShape.checkForResize(currentPos)) {
+        if (target.shape.checkForResize(currentPos)) {
           this.isResizing = true;
         }
       }
@@ -169,8 +197,33 @@ export class Game {
   }
 
   mouseMove(e: MouseEvent) {
+    const currentPos = {
+      x: e.clientX,
+      y: e.clientY,
+    };
+
+    if (this.isPanning) {
+      const dx = currentPos.x - this.startCoordinates.x;
+      const dy = currentPos.y - this.startCoordinates.y;
+
+      this.offset.x += dx;
+      this.offset.y += dy;
+      this.startCoordinates = currentPos;
+
+      this.ctx.setTransform(1, 0, 0, 1, this.offset.x, this.offset.y);
+      this.clearCanvas();
+      return;
+    }
+
     if (!this.selectedShape) return;
-    const currentPos = { x: e.clientX, y: e.clientY };
+
+    // Adjust position for offset only when not panning
+    currentPos.x -= this.offset.x;
+    currentPos.y -= this.offset.y;
+
+    if (this.selectedShape) {
+      this.selectedShape.showCursor(this.canvas, currentPos);
+    }
 
     if (this.isDrawing || this.isResizing) {
       this.clearCanvas();
@@ -180,10 +233,15 @@ export class Game {
   }
 
   mouseUp(e: MouseEvent) {
+    if (this.isPanning) {
+      this.isPanning = false;
+      return;
+    }
+
     if (!this.selectedShape) return;
+    this.canvas.style.cursor = "default";
 
     if (this.isDrawing) {
-      this.selectedShape.getProperties();
       this.sendSocketMessage("CHAT", this.selectedShape.getProperties());
 
       this.isDrawing = false;
@@ -192,15 +250,13 @@ export class Game {
     }
 
     if (this.isResizing) {
-      this.selectedShape.closeResize();
-
       this.sendSocketMessage("UPDATE", {
         id: this.selectedShape.id,
         shape: this.selectedShape.getProperties(),
       });
 
       this.isResizing = false;
-      this.selectedShape = null;
+      this.selectedShape.closeResize();
       return;
     }
   }
@@ -228,6 +284,11 @@ export class Game {
         newLine.updateProperties(shape);
 
         return newLine;
+      case "pencil":
+        const newPencil = new Pencil(this.ctx, id);
+        newPencil.updateProperties(shape);
+
+        return newPencil;
     }
   }
 
@@ -243,6 +304,11 @@ export class Game {
 
   setTool(tool: Tools) {
     this.currentTool = tool;
+    if (tool !== Tools.Cursor) {
+      this.canvas.style.cursor = "crosshair";
+    } else {
+      this.canvas.style.cursor = "default";
+    }
   }
 
   destroy() {

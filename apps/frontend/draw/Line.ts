@@ -1,4 +1,4 @@
-import { LineType, ShapeType } from "@/types";
+import { LineType, Point } from "@/types";
 import { Shape } from "./Shape";
 
 export class Line extends Shape {
@@ -11,10 +11,7 @@ export class Line extends Shape {
     this.id = id;
   }
 
-  update(
-    startPos: { x: number; y: number },
-    currentPos: { x: number; y: number }
-  ) {
+  update(startPos: Point, currentPos: Point) {
     if (this.activeHandle) {
       switch (this.activeHandle.position) {
         case "full":
@@ -47,7 +44,7 @@ export class Line extends Shape {
 
   draw() {
     if (this.activeHandle) {
-      this.renderResizeHandles();
+      this.drawHandles();
     }
 
     this.ctx.beginPath();
@@ -56,9 +53,9 @@ export class Line extends Shape {
     this.ctx.stroke();
   }
 
-  getProperties(): ShapeType {
+  getProperties() {
     const properties = {
-      kind: "line" as const,
+      kind: "line",
       x: this.x,
       y: this.y,
       x2: this.x2,
@@ -75,7 +72,7 @@ export class Line extends Shape {
     this.y2 = shape.y2;
   }
 
-  isSelected(currentPos: { x: number; y: number }) {
+  isSelected(currentPos: Point) {
     const a = { x: this.x, y: this.y };
     const b = { x: this.x2, y: this.y2 };
     const c = currentPos;
@@ -96,44 +93,42 @@ export class Line extends Shape {
     );
 
     if (distance <= 10) {
-      this.renderResizeHandles();
+      this.drawHandles();
       return true;
     }
     return false;
   }
 
-  renderResizeHandles() {
+  updateResizeHandles() {
     this.resizeHandles = [
       {
         x: (this.x + this.x2) / 2,
         y: (this.y + this.y2) / 2,
         cursor: "move",
         position: "full",
-        width: 16,
-        height: 16,
+        width: 8,
+        height: 8,
       },
       {
         x: this.x,
         y: this.y,
-        cursor: "nw-resize",
+        cursor: "ne-resize",
         position: "top-left",
-        width: 16,
-        height: 16,
+        width: 8,
+        height: 8,
       },
       {
         x: this.x2,
         y: this.y2,
         cursor: "ne-resize",
         position: "top-right",
-        width: 16,
-        height: 16,
+        width: 8,
+        height: 8,
       },
     ];
-
-    this.drawHandles();
   }
 
-  closeResize() {
-    this.activeHandle = null;
+  drawOutline() {
+    this.ctx.strokeRect(this.x, this.y, this.x2 - this.x, this.y2 - this.y);
   }
 }

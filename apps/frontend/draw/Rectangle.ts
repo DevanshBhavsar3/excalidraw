@@ -1,4 +1,4 @@
-import { RectangleType, ShapeType } from "@/types";
+import { Point, RectangleType, ShapeType } from "@/types";
 import { Shape } from "./Shape";
 
 export class Rectangle extends Shape {
@@ -11,10 +11,7 @@ export class Rectangle extends Shape {
     this.id = id;
   }
 
-  update(
-    startPos: { x: number; y: number },
-    currentPos: { x: number; y: number }
-  ) {
+  update(startPos: Point, currentPos: Point) {
     if (this.activeHandle) {
       switch (this.activeHandle.position) {
         case "full":
@@ -27,26 +24,6 @@ export class Rectangle extends Shape {
         case "bottom-right":
           this.width = currentPos.x - this.x;
           this.height = currentPos.y - this.y;
-          break;
-        case "top-left":
-          const newWidth = this.width + (this.x - currentPos.x);
-          const newHeight = this.height + (this.y - currentPos.y);
-          this.x = currentPos.x;
-          this.y = currentPos.y;
-          this.width = newWidth;
-          this.height = newHeight;
-          break;
-        case "top-right":
-          const oldBottom = this.y + this.height;
-          this.width = currentPos.x - this.x;
-          this.y = currentPos.y;
-          this.height = oldBottom - currentPos.y;
-          break;
-        case "bottom-left":
-          const oldRight = this.x + this.width;
-          this.height = currentPos.y - this.y;
-          this.x = currentPos.x;
-          this.width = oldRight - currentPos.x;
           break;
       }
     } else {
@@ -64,7 +41,7 @@ export class Rectangle extends Shape {
 
   draw() {
     if (this.activeHandle) {
-      this.renderResizeHandles();
+      this.drawHandles();
     }
     this.ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
@@ -88,7 +65,7 @@ export class Rectangle extends Shape {
     this.height = shape.height;
   }
 
-  isSelected(currentPos: { x: number; y: number }) {
+  isSelected(currentPos: Point) {
     const minX = Math.min(this.x, this.x + this.width);
     const maxX = Math.max(this.x, this.x + this.width);
     const minY = Math.min(this.y, this.y + this.height);
@@ -100,14 +77,14 @@ export class Rectangle extends Shape {
       currentPos.y >= minY &&
       currentPos.y <= maxY
     ) {
-      this.renderResizeHandles();
+      this.drawHandles();
       return true;
     }
 
     return false;
   }
 
-  renderResizeHandles() {
+  updateResizeHandles() {
     // #TODO: make it more structured
     this.resizeHandles = [
       {
@@ -115,47 +92,21 @@ export class Rectangle extends Shape {
         y: this.y + this.height / 2,
         cursor: "move",
         position: "full",
-        width: 16,
-        height: 16,
-      },
-      {
-        x: this.x,
-        y: this.y,
-        cursor: "nw-resize",
-        position: "top-left",
-        width: 16,
-        height: 16,
-      },
-      {
-        x: this.x + this.width,
-        y: this.y,
-        cursor: "ne-resize",
-        position: "top-right",
-        width: 16,
-        height: 16,
-      },
-      {
-        x: this.x,
-        y: this.y + this.height,
-        cursor: "sw-resize",
-        position: "bottom-left",
-        width: 16,
-        height: 16,
+        width: 8,
+        height: 8,
       },
       {
         x: this.x + this.width,
         y: this.y + this.height,
         cursor: "se-resize",
         position: "bottom-right",
-        width: 16,
-        height: 16,
+        width: 8,
+        height: 8,
       },
     ];
-
-    this.drawHandles();
   }
 
-  closeResize() {
-    this.activeHandle = null;
+  drawOutline() {
+    this.ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
 }

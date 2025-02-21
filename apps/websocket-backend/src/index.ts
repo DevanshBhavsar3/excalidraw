@@ -38,7 +38,7 @@ wss.on("connection", (socket, req) => {
   const userId = checkUser(token);
 
   if (!userId) {
-    socket.send("Invalid token.");
+    socket.send(JSON.stringify({ type: "ERROR", message: "Invalid token." }));
     socket.close();
     return;
   }
@@ -57,7 +57,9 @@ wss.on("connection", (socket, req) => {
           });
 
           if (!room) {
-            socket.send("Invalid room id.");
+            socket.send(
+              JSON.stringify({ type: "ERROR", message: "Invalid room Id." })
+            );
             socket.close();
           }
 
@@ -123,7 +125,9 @@ wss.on("connection", (socket, req) => {
       }
     } catch (e) {
       console.log(e);
-      socket.send("Failed");
+      socket.send(
+        JSON.stringify({ type: "ERROR", message: "Something went wrong." })
+      );
     }
   });
 });

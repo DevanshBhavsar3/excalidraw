@@ -1,4 +1,4 @@
-import { CircleType, ShapeType } from "@/types";
+import { CircleType, Point, ShapeType } from "@/types";
 import { Shape } from "./Shape";
 
 export class Circle extends Shape {
@@ -10,10 +10,7 @@ export class Circle extends Shape {
     this.id = id;
   }
 
-  update(
-    startPos: { x: number; y: number },
-    currentPos: { x: number; y: number }
-  ) {
+  update(startPos: Point, currentPos: Point) {
     if (this.activeHandle) {
       switch (this.activeHandle.position) {
         case "full":
@@ -21,16 +18,23 @@ export class Circle extends Shape {
           this.y = currentPos.y;
           break;
         case "bottom-right":
-        case "top-right":
-        case "top-left":
-        case "bottom-left":
-          this.radius = Math.floor(Math.abs(this.y - currentPos.y));
+          this.radius = Math.floor(
+            Math.sqrt(
+              Math.pow(currentPos.x - this.x, 2) +
+                Math.pow(currentPos.y - this.y, 2)
+            )
+          );
           break;
       }
     } else {
       this.x = startPos.x;
       this.y = startPos.y;
-      this.radius = Math.floor(Math.abs(currentPos.y - startPos.y));
+      this.radius = Math.floor(
+        Math.sqrt(
+          Math.pow(currentPos.x - startPos.x, 2) +
+            Math.pow(currentPos.y - startPos.y, 2)
+        )
+      );
 
       this.draw();
     }
@@ -38,7 +42,7 @@ export class Circle extends Shape {
 
   draw() {
     if (this.activeHandle) {
-      this.renderResizeHandles();
+      this.drawHandles();
     }
 
     this.ctx.beginPath();
@@ -63,43 +67,46 @@ export class Circle extends Shape {
     this.radius = shape.radius;
   }
 
-  isSelected(currentPos: { x: number; y: number }) {
+  isSelected(currentPos: Point) {
     const distance = Math.sqrt(
       Math.pow(currentPos.x - this.x, 2) + Math.pow(currentPos.y - this.y, 2)
     );
 
     if (distance < this.radius) {
-      this.renderResizeHandles();
+      this.drawHandles();
       return true;
     }
 
     return false;
   }
 
-  renderResizeHandles() {
+  updateResizeHandles() {
     this.resizeHandles = [
       {
         x: this.x,
         y: this.y,
         cursor: "move",
         position: "full",
-        width: 16,
-        height: 16,
+        width: 8,
+        height: 8,
       },
       {
         x: this.x + this.radius,
-        y: this.y + this.radius,
+        y: this.y,
         cursor: "se-resize",
         position: "bottom-right",
-        width: 16,
-        height: 16,
+        width: 8,
+        height: 8,
       },
     ];
-
-    this.drawHandles();
   }
 
-  closeResize() {
-    this.activeHandle = null;
+  drawOutline() {
+    this.ctx.strokeRect(
+      this.x - this.radius,
+      this.y - this.radius,
+      this.radius * 2,
+      this.radius * 2
+    );
   }
 }

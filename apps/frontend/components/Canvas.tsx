@@ -1,12 +1,13 @@
 "use client";
 
 import { Game } from "@/draw/Game";
-import { ConfigType, Tools } from "@/types";
+import { Tools } from "@/types";
 import { useEffect, useRef, useState } from "react";
-import { BiRectangle, BiCircle } from "react-icons/bi";
+import { BiRectangle, BiCircle, BiPencil } from "react-icons/bi";
 import { RxCursorArrow } from "react-icons/rx";
 import { TfiLayoutLineSolid } from "react-icons/tfi";
 import { AiTwotoneDelete } from "react-icons/ai";
+import { FaRegHandPaper } from "react-icons/fa";
 
 export function Canvas({
   socket,
@@ -36,6 +37,9 @@ export function Canvas({
     <div>
       <canvas ref={canvasRef} className="h-screen w-screen"></canvas>
       <div className="fixed top-5 left-1/2 bg-white text-black">
+        <button onClick={() => game?.setTool(Tools.Hand)}>
+          <FaRegHandPaper size={24} />
+        </button>
         <button onClick={() => game?.setTool(Tools.Cursor)}>
           <RxCursorArrow size={24} />
         </button>
@@ -47,6 +51,9 @@ export function Canvas({
         </button>
         <button onClick={() => game?.setTool(Tools.Line)}>
           <TfiLayoutLineSolid size={24} />
+        </button>
+        <button onClick={() => game?.setTool(Tools.Pencil)}>
+          <BiPencil size={24} />
         </button>
         <button onClick={() => game?.deleteShape()}>
           <AiTwotoneDelete size={24} />

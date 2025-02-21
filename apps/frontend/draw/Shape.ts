@@ -1,4 +1,4 @@
-import { ResizeHandle } from "@/types";
+import { Point, ResizeHandle } from "@/types";
 
 export abstract class Shape {
   protected ctx: CanvasRenderingContext2D;
@@ -11,7 +11,9 @@ export abstract class Shape {
     this.ctx = ctx;
   }
 
-  checkForResize(pos: { x: number; y: number }) {
+  checkForResize(pos: Point) {
+    this.updateResizeHandles();
+
     this.resizeHandles.forEach((handle) => {
       if (!this.activeHandle) {
         if (
@@ -19,6 +21,7 @@ export abstract class Shape {
           Math.abs(pos.y - handle.y) <= handle.height
         ) {
           this.activeHandle = handle;
+          return true;
         }
       }
     });
@@ -27,24 +30,45 @@ export abstract class Shape {
   }
 
   drawHandles() {
+    this.updateResizeHandles();
+
+    this.ctx.fillStyle = "#ffffff";
+    this.ctx.strokeStyle = "#0000FF";
+
+    this.ctx.setLineDash([10]);
+    this.drawOutline();
+    this.ctx.setLineDash([0]);
+
     this.resizeHandles.forEach((handle) => {
-      this.ctx.strokeStyle = "#0000FF";
-      this.ctx.fillStyle = "#ffffff";
-
-      this.ctx.fillRect(
-        handle.x - 8,
-        handle.y - 8,
+      this.ctx.beginPath();
+      this.ctx.roundRect(
+        handle.x - 4,
+        handle.y - 4,
         handle.width,
-        handle.height
+        handle.height,
+        4
       );
-      this.ctx.strokeRect(
-        handle.x - 8,
-        handle.y - 8,
-        handle.width,
-        handle.height
-      );
-
-      this.ctx.strokeStyle = "#000000";
+      this.ctx.stroke();
     });
+    this.ctx.strokeStyle = "#000000";
   }
+
+  showCursor(canvas: HTMLCanvasElement, currentPos: Point) {
+    const handleUnderCursor = this.resizeHandles.find(
+      (handle) =>
+        Math.abs(currentPos.x - handle.x) <= handle.width &&
+        Math.abs(currentPos.y - handle.y) <= handle.height
+    );
+
+    canvas.style.cursor = handleUnderCursor
+      ? handleUnderCursor.cursor
+      : "default";
+  }
+
+  closeResize() {
+    this.activeHandle = null;
+  }
+
+  abstract updateResizeHandles(): void;
+  abstract drawOutline(): void;
 }

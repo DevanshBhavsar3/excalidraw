@@ -1,14 +1,15 @@
-export type Tool = "rect" | "circle" | "line" | "cursor";
-
-export type ConfigType = {
-  currentTool: Tool;
+export type Point = {
+  x: number;
+  y: number;
 };
 
 export enum Tools {
+  Hand = "Hand",
   Cursor = "Cursor",
   Rectangle = "Rectangle",
   Circle = "Circle",
   Line = "Line",
+  Pencil = "Pencil",
 }
 
 export type RectangleType = {
@@ -34,7 +35,12 @@ export type LineType = {
   y2: number;
 };
 
-export type ShapeType = RectangleType | CircleType | LineType;
+export type PencilType = {
+  kind: "pencil";
+  strokes: Point[];
+};
+
+export type ShapeType = RectangleType | CircleType | LineType | PencilType;
 
 export interface ResizeHandle {
   x: number;
@@ -44,10 +50,3 @@ export interface ResizeHandle {
   cursor: string;
   position: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "full";
 }
-
-export type RectangleConfig = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
