@@ -20,6 +20,7 @@ export class Game {
   private shapes: Chat[] = [];
   private startCoordinates: Point = { x: 0, y: 0 };
   private offset: Point = { x: 0, y: 0 };
+  private scale: number = 1;
   private isDrawing = false;
   private isResizing = false;
   private isPanning = false;
@@ -116,12 +117,10 @@ export class Game {
   }
 
   clearCanvas() {
-    this.ctx.clearRect(
-      0 - this.offset.x,
-      0 - this.offset.y,
-      this.canvas.width,
-      this.canvas.height
-    );
+    this.ctx.save();
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.restore();
 
     this.shapes.forEach((shape) => {
       if (shape.shape) {
@@ -142,14 +141,14 @@ export class Game {
 
   mouseDown(e: MouseEvent) {
     const currentPos = {
-      x: e.clientX - this.offset.x,
-      y: e.clientY - this.offset.y,
+      x: e.clientX,
+      y: e.clientY,
     };
 
     if (this.currentTool !== Tools.Cursor && this.currentTool !== Tools.Hand) {
       this.isDrawing = true;
-      this.startCoordinates.x = e.clientX - this.offset.x;
-      this.startCoordinates.y = e.clientY - this.offset.y;
+      this.startCoordinates.x = (e.clientX - this.offset.x) * this.scale;
+      this.startCoordinates.y = (e.clientY - this.offset.y) * this.scale;
 
       switch (this.currentTool) {
         case Tools.Rectangle:
@@ -201,7 +200,6 @@ export class Game {
       x: e.clientX,
       y: e.clientY,
     };
-
     if (this.isPanning) {
       const dx = currentPos.x - this.startCoordinates.x;
       const dy = currentPos.y - this.startCoordinates.y;
@@ -210,16 +208,22 @@ export class Game {
       this.offset.y += dy;
       this.startCoordinates = currentPos;
 
-      this.ctx.setTransform(1, 0, 0, 1, this.offset.x, this.offset.y);
+      this.ctx.setTransform(
+        this.scale,
+        0,
+        0,
+        this.scale,
+        this.offset.x,
+        this.offset.y
+      );
       this.clearCanvas();
       return;
     }
 
     if (!this.selectedShape) return;
 
-    // Adjust position for offset only when not panning
-    currentPos.x -= this.offset.x;
-    currentPos.y -= this.offset.y;
+    currentPos.x = (currentPos.x - this.offset.x) * this.scale;
+    currentPos.y = (currentPos.y - this.offset.y) * this.scale;
 
     if (this.selectedShape) {
       this.selectedShape.showCursor(this.canvas, currentPos);
@@ -265,6 +269,12 @@ export class Game {
     this.canvas.addEventListener("mousedown", (e) => this.mouseDown(e));
     this.canvas.addEventListener("mousemove", (e) => this.mouseMove(e));
     this.canvas.addEventListener("mouseup", (e) => this.mouseUp(e));
+
+    this.canvas.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      const scale = e.deltaY * 0.001;
+      this.zoom(scale, e);
+    });
   }
 
   createShapeClass(shape: ShapeType, id: number) {
@@ -309,6 +319,27 @@ export class Game {
     } else {
       this.canvas.style.cursor = "default";
     }
+  }
+
+  zoom(scale: number, e: MouseEvent) {
+    const oldScale = this.scale;
+
+    this.scale = Number(
+      Math.max(0.01, Math.min(5, this.scale - scale)).toFixed(2)
+    );
+
+    this.ctx.setTransform(
+      this.scale,
+      0,
+      0,
+      this.scale,
+      this.offset.x,
+      this.offset.y
+    );
+
+    this.canvas.width = window.innerWidth * this.scale;
+    this.canvas.height = window.innerHeight * this.scale;
+    this.clearCanvas();
   }
 
   destroy() {

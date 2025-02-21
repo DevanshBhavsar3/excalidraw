@@ -3,7 +3,13 @@
 import { Game } from "@/draw/Game";
 import { Tools } from "@/types";
 import { useEffect, useRef, useState } from "react";
-import { BiRectangle, BiCircle, BiPencil } from "react-icons/bi";
+import {
+  BiRectangle,
+  BiCircle,
+  BiPencil,
+  BiPlus,
+  BiMinus,
+} from "react-icons/bi";
 import { RxCursorArrow } from "react-icons/rx";
 import { TfiLayoutLineSolid } from "react-icons/tfi";
 import { AiTwotoneDelete } from "react-icons/ai";
@@ -58,6 +64,12 @@ export function Canvas({
         <button onClick={() => game?.deleteShape()}>
           <AiTwotoneDelete size={24} />
         </button>
+        {/* <button onClick={() => game?.zoom(0.1)}>
+          <BiPlus size={24} />
+        </button>
+        <button onClick={() => game?.zoom(-0.1)}>
+          <BiMinus size={24} />
+        </button> */}
       </div>
     </div>
   );
