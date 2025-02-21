@@ -122,6 +122,10 @@ export class Game {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.restore();
 
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.translate(this.offset.x, this.offset.y);
+    this.ctx.scale(this.scale, this.scale);
+
     this.shapes.forEach((shape) => {
       if (shape.shape) {
         shape.shape.draw();
@@ -141,14 +145,14 @@ export class Game {
 
   mouseDown(e: MouseEvent) {
     const currentPos = {
-      x: e.clientX,
-      y: e.clientY,
+      x: (e.clientX - this.offset.x) / this.scale,
+      y: (e.clientY - this.offset.y) / this.scale,
     };
 
     if (this.currentTool !== Tools.Cursor && this.currentTool !== Tools.Hand) {
       this.isDrawing = true;
-      this.startCoordinates.x = (e.clientX - this.offset.x) * this.scale;
-      this.startCoordinates.y = (e.clientY - this.offset.y) * this.scale;
+      this.startCoordinates.x = currentPos.x;
+      this.startCoordinates.y = currentPos.y;
 
       switch (this.currentTool) {
         case Tools.Rectangle:
@@ -208,22 +212,14 @@ export class Game {
       this.offset.y += dy;
       this.startCoordinates = currentPos;
 
-      this.ctx.setTransform(
-        this.scale,
-        0,
-        0,
-        this.scale,
-        this.offset.x,
-        this.offset.y
-      );
       this.clearCanvas();
       return;
     }
 
     if (!this.selectedShape) return;
 
-    currentPos.x = (currentPos.x - this.offset.x) * this.scale;
-    currentPos.y = (currentPos.y - this.offset.y) * this.scale;
+    currentPos.x = (currentPos.x - this.offset.x) / this.scale;
+    currentPos.y = (currentPos.y - this.offset.y) / this.scale;
 
     if (this.selectedShape) {
       this.selectedShape.showCursor(this.canvas, currentPos);
@@ -321,24 +317,27 @@ export class Game {
     }
   }
 
-  zoom(scale: number, e: MouseEvent) {
+  zoom(scale: number, e: WheelEvent) {
     const oldScale = this.scale;
-
     this.scale = Number(
-      Math.max(0.01, Math.min(5, this.scale - scale)).toFixed(2)
+      Math.max(0.1, Math.min(5, this.scale - scale)).toFixed(2)
     );
 
-    this.ctx.setTransform(
-      this.scale,
-      0,
-      0,
-      this.scale,
-      this.offset.x,
-      this.offset.y
-    );
+    // Get mouse position relative to canvas
+    const mouseX = e.clientX - this.offset.x;
+    const mouseY = e.clientY - this.offset.y;
 
-    this.canvas.width = window.innerWidth * this.scale;
-    this.canvas.height = window.innerHeight * this.scale;
+    // Adjust offset based on mouse position and scale change
+    this.offset.x -= mouseX * (this.scale / oldScale - 1);
+    this.offset.y -= mouseY * (this.scale / oldScale - 1);
+
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.translate(this.offset.x, this.offset.y);
+    this.ctx.scale(this.scale, this.scale);
+
     this.clearCanvas();
   }
 

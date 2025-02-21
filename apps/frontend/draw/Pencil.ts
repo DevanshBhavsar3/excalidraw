@@ -1,4 +1,4 @@
-import { PencilType, Point, ShapeType } from "@/types";
+import { PencilType, Point } from "@/types";
 import { Shape } from "./Shape";
 
 export class Pencil extends Shape {
@@ -21,7 +21,6 @@ export class Pencil extends Shape {
         const deltaX = currentPos.x - this.strokes[0].x;
         const deltaY = currentPos.y - this.strokes[0].y;
 
-        console.log(deltaX, deltaY);
         this.strokes = this.strokes.map((stroke) => ({
           x: stroke.x + deltaX,
           y: stroke.y + deltaY,
