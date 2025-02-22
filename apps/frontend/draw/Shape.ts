@@ -1,4 +1,4 @@
-import { Point, ResizeHandle } from "@/types";
+import { Point, ResizeHandle, ShapeConfig } from "@/types";
 
 export abstract class Shape {
   protected ctx: CanvasRenderingContext2D;
@@ -6,9 +6,11 @@ export abstract class Shape {
   protected y = 0;
   protected activeHandle: ResizeHandle | null = null;
   protected resizeHandles: ResizeHandle[] = [];
+  protected shapeConfig: ShapeConfig;
 
-  constructor(ctx: CanvasRenderingContext2D) {
+  constructor(ctx: CanvasRenderingContext2D, shapeConfig: ShapeConfig) {
     this.ctx = ctx;
+    this.shapeConfig = shapeConfig;
   }
 
   checkForResize(pos: Point) {

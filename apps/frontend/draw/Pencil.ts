@@ -1,4 +1,4 @@
-import { PencilType, Point } from "@/types";
+import { PencilType, Point, ShapeConfig } from "@/types";
 import { Shape } from "./Shape";
 
 export class Pencil extends Shape {
@@ -7,8 +7,12 @@ export class Pencil extends Shape {
   private maxPoint: Point = { x: -100000, y: -100000 };
   public id: number;
 
-  constructor(ctx: CanvasRenderingContext2D, id: number = 0) {
-    super(ctx);
+  constructor(
+    ctx: CanvasRenderingContext2D,
+    shapeConfig: ShapeConfig,
+    id: number = 0
+  ) {
+    super(ctx, shapeConfig);
     this.id = id;
     ctx.strokeStyle = "#000000";
     ctx.lineCap = "round";
@@ -64,6 +68,7 @@ export class Pencil extends Shape {
     const properties = {
       kind: "pencil",
       strokes: this.strokes,
+      config: this.shapeConfig,
     };
 
     return properties;

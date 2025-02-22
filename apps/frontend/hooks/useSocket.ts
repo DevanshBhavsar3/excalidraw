@@ -1,11 +1,18 @@
-import { WEBSOCKET_URL } from "@/app/config";
+import { WEBSOCKET_URL } from "@/config";
 import { useEffect, useState } from "react";
 
 export function useSocket(roomId: number) {
   const [loading, setLoading] = useState<boolean>(true);
   const [socket, setSocket] = useState<WebSocket>();
+
   useEffect(() => {
     const token = localStorage.getItem("token");
+
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     const socket = new WebSocket(`${WEBSOCKET_URL}?token=${token}`);
 
     socket.onopen = () => {
@@ -21,7 +28,9 @@ export function useSocket(roomId: number) {
     };
 
     return () => {
-      socket.close();
+      if (socket.readyState === socket.OPEN) {
+        socket.close();
+      }
     };
   }, []);
 

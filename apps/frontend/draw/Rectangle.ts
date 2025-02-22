@@ -1,13 +1,21 @@
-import { Point, RectangleType, ShapeType } from "@/types";
+import { Point, RectangleType, ShapeConfig, ShapeType } from "@/types";
 import { Shape } from "./Shape";
+import { RoughCanvas } from "roughjs/bin/canvas";
 
 export class Rectangle extends Shape {
+  private rc: RoughCanvas;
   public id: number;
   private width = 0;
   private height = 0;
 
-  constructor(ctx: CanvasRenderingContext2D, id: number = 0) {
-    super(ctx);
+  constructor(
+    rc: RoughCanvas,
+    ctx: CanvasRenderingContext2D,
+    shapeConfig: ShapeConfig,
+    id: number = 0
+  ) {
+    super(ctx, shapeConfig);
+    this.rc = rc;
     this.id = id;
   }
 
@@ -43,7 +51,11 @@ export class Rectangle extends Shape {
     if (this.activeHandle) {
       this.drawHandles();
     }
-    this.ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+    this.rc.rectangle(this.x, this.y, this.width, this.height, {
+      seed: 1,
+      ...this.shapeConfig,
+    });
   }
 
   getProperties(): ShapeType {
@@ -53,6 +65,7 @@ export class Rectangle extends Shape {
       y: this.y,
       width: this.width,
       height: this.height,
+      config: this.shapeConfig,
     };
 
     return properties;
@@ -85,7 +98,6 @@ export class Rectangle extends Shape {
   }
 
   updateResizeHandles() {
-    // #TODO: make it more structured
     this.resizeHandles = [
       {
         x: this.x + this.width / 2,

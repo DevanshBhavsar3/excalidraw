@@ -18,7 +18,7 @@ export function authMiddleware(
   const token = req.header("authorization");
 
   if (!token) {
-    res.json({ error: "Token required." });
+    res.status(400).json({ error: "Token required." });
     return;
   }
 
@@ -28,7 +28,7 @@ export function authMiddleware(
 
     next();
   } catch (e) {
-    res.json({ error: "Invalid token." });
+    res.status(400).json({ error: "Invalid token." });
     return;
   }
 }

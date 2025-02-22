@@ -1,13 +1,21 @@
-import { LineType, Point } from "@/types";
+import { LineType, Point, ShapeConfig } from "@/types";
 import { Shape } from "./Shape";
+import { RoughCanvas } from "roughjs/bin/canvas";
 
 export class Line extends Shape {
+  private rc: RoughCanvas;
   private x2 = 0;
   private y2 = 0;
   public id: number;
 
-  constructor(ctx: CanvasRenderingContext2D, id: number = 0) {
-    super(ctx);
+  constructor(
+    rc: RoughCanvas,
+    ctx: CanvasRenderingContext2D,
+    shapeConfig: ShapeConfig,
+    id: number = 0
+  ) {
+    super(ctx, shapeConfig);
+    this.rc = rc;
     this.id = id;
   }
 
@@ -47,10 +55,10 @@ export class Line extends Shape {
       this.drawHandles();
     }
 
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.x, this.y);
-    this.ctx.lineTo(this.x2, this.y2);
-    this.ctx.stroke();
+    this.rc.line(this.x, this.y, this.x2, this.y2, {
+      seed: 1,
+      ...this.shapeConfig,
+    });
   }
 
   getProperties() {
@@ -60,6 +68,7 @@ export class Line extends Shape {
       y: this.y,
       x2: this.x2,
       y2: this.y2,
+      config: this.shapeConfig,
     };
 
     return properties;

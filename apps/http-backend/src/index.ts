@@ -53,26 +53,34 @@ app.post("/signin", async (req, res) => {
 
   const body = parsedBody.data;
 
-  const user = await prisma.user.findUnique({
-    where: {
-      username: body.username,
-    },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        username: body.username,
+      },
+    });
 
-  if (!user) {
-    res.status(400).json({ error: "User doesn't exists." });
+    if (!user) {
+      res.status(400).json({ error: "User doesn't exists." });
+      return;
+    }
+
+    const isCorrectPassword = await bcrypt.compare(
+      body.password,
+      user.password
+    );
+    if (!isCorrectPassword) {
+      res.status(400).json({ error: "Invalid Password." });
+      return;
+    }
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+
+    res.json({ token });
+  } catch (e) {
+    res.status(500).json({ error: "Something went wrong." });
     return;
   }
-
-  const isCorrectPassword = await bcrypt.compare(body.password, user.password);
-  if (!isCorrectPassword) {
-    res.status(400).json({ error: "Invalid Password." });
-    return;
-  }
-
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET);
-
-  res.json({ token });
 });
 
 app.post("/create", authMiddleware, async (req, res) => {
@@ -94,7 +102,7 @@ app.post("/create", authMiddleware, async (req, res) => {
     });
     res.json({ roomId: room.id });
   } catch (e) {
-    res.json({ error: "Room already exists." });
+    res.status(400).json({ error: "Room already exists." });
   }
 });
 
@@ -126,21 +134,43 @@ app.get("/chats/:roomId", authMiddleware, async (req, res) => {
   }
 });
 
-app.get("/room/:slug", authMiddleware, async (req, res) => {
+app.get("/room/:slug", async (req, res) => {
   const slug = req.params.slug;
 
-  const room = await prisma.room.findFirst({
-    where: {
-      slug,
-    },
-  });
+  try {
+    const room = await prisma.room.findUnique({
+      where: {
+        slug,
+      },
+    });
 
-  if (!room) {
-    res.status(400).json({ error: "Invalid slug." });
+    if (!room) {
+      res.status(400).json({ error: "Invalid slug." });
+      return;
+    }
+
+    res.json(room);
+  } catch (e) {
+    res.status(500).json({ error: "Something went wrong." });
     return;
   }
+});
 
-  res.json(room);
+app.get("/user/rooms", authMiddleware, async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    const room = await prisma.room.findMany({
+      where: {
+        adminId: userId,
+      },
+    });
+
+    res.json(room);
+  } catch (e) {
+    res.status(500).json({ error: "Something went wrong." });
+    return;
+  }
 });
 
 app.listen(PORT, () => console.log(`Server started on PORT: ${PORT}`));

@@ -26,7 +26,7 @@ model Room {
   slug      String   @unique
   createdAt DateTime @default(now())
   adminId   String
-  admin     User     @relation(fields: [adminId], references: [id])
+  admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
   Chat      Chat[]
 }
 
@@ -35,6 +35,6 @@ model Chat {
   roomId  Int
   message String
   userId  String
-  user    User   @relation(fields: [userId], references: [id])
-  room    Room   @relation(fields: [roomId], references: [id])
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room    Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
 }

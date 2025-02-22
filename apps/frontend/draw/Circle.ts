@@ -1,12 +1,20 @@
-import { CircleType, Point, ShapeType } from "@/types";
+import { CircleType, Point, ShapeConfig, ShapeType } from "@/types";
 import { Shape } from "./Shape";
+import { RoughCanvas } from "roughjs/bin/canvas";
 
 export class Circle extends Shape {
+  private rc: RoughCanvas;
   private radius = 0;
   public id: number;
 
-  constructor(ctx: CanvasRenderingContext2D, id: number = 0) {
-    super(ctx);
+  constructor(
+    rc: RoughCanvas,
+    ctx: CanvasRenderingContext2D,
+    shapeConfig: ShapeConfig,
+    id: number = 0
+  ) {
+    super(ctx, shapeConfig);
+    this.rc = rc;
     this.id = id;
   }
 
@@ -45,9 +53,10 @@ export class Circle extends Shape {
       this.drawHandles();
     }
 
-    this.ctx.beginPath();
-    this.ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-    this.ctx.stroke();
+    this.rc.circle(this.x, this.y, this.radius * 2, {
+      seed: 1,
+      ...this.shapeConfig,
+    });
   }
 
   getProperties(): ShapeType {
@@ -56,6 +65,7 @@ export class Circle extends Shape {
       x: this.x,
       y: this.y,
       radius: this.radius,
+      config: this.shapeConfig,
     };
 
     return properties;
