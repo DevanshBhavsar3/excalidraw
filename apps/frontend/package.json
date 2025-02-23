@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
     "axios": "^1.7.9",
     "next": "15.1.7",
     "react": "^19.0.0",
