@@ -118,7 +118,7 @@ export function Canvas({
                 type="range"
                 min={0}
                 max={5}
-                defaultValue={1}
+                value={currentState.config.roughness}
                 onChange={(e) => {
                   changeConfig("roughness", Number(e.target.value));
                 }}
@@ -128,10 +128,10 @@ export function Canvas({
               <p className="text-sm font-medium">Fill</p>
               <input
                 type="color"
-                defaultValue={"#ffffff"}
+                value={currentState.config.fill}
                 onChange={(e) => {
                   if (e.target.value === "#ffffff") {
-                    changeConfig("fill", "rgba(0, 0, 0 ,0)");
+                    changeConfig("fill", "rgba(0,0,0,0)");
                   } else {
                     changeConfig("fill", e.target.value);
                   }
@@ -142,6 +142,7 @@ export function Canvas({
               <p className="text-sm font-medium">Stroke</p>
               <input
                 type="color"
+                value={currentState.config.stroke}
                 onChange={(e) => {
                   changeConfig("stroke", e.target.value);
                 }}
@@ -155,7 +156,7 @@ export function Canvas({
                 type="range"
                 min={1}
                 max={10}
-                defaultValue={1}
+                value={currentState.config.strokeWidth}
                 onChange={(e) => {
                   changeConfig("strokeWidth", Number(e.target.value));
                 }}
