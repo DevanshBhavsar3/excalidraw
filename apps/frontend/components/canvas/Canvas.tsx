@@ -18,6 +18,8 @@ import { MdRectangle } from "react-icons/md";
 import { CgShapeZigzag } from "react-icons/cg";
 import { CgViewMonth } from "react-icons/cg";
 import { TfiLineDashed } from "react-icons/tfi";
+import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
+import Link from "next/link";
 
 export function Canvas({
   socket,
@@ -104,6 +106,12 @@ export function Canvas({
 
   return (
     <div>
+      <Link
+        href={"/dashboard"}
+        className="fixed top-5 left-5 p-1 border border-primary hover:bg-primary rounded-md flex justify-center items-center hover:text-white cursor-pointer transition-all"
+      >
+        <MdOutlineKeyboardArrowLeft size={24} />
+      </Link>
       <canvas ref={canvasRef} className="h-screen w-screen"></canvas>
       {/* Config options */}
       {currentState?.tool !== Tools.Cursor &&

@@ -1,6 +1,7 @@
-import { CanvasPage } from "@/components/CanvasPage";
+import { CanvasPage } from "@/components/canvas/CanvasPage";
 import { HTTP_URL } from "@/config";
 import axios from "axios";
+import Link from "next/link";
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const slug = (await params).slug;
@@ -11,6 +12,16 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
     return <CanvasPage roomId={roomId} />;
   } catch (e) {
-    return <div>Invalid slug</div>;
+    return (
+      <div className="h-screen flex flex-col justify-center items-center">
+        <p className="text-3xl">Invalid Room Name</p>
+        <p>
+          Go to{" "}
+          <Link href={"/dashboard"} className="underline text-blue-500">
+            dashboard
+          </Link>
+        </p>
+      </div>
+    );
   }
 }
