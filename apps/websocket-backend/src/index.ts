@@ -63,7 +63,11 @@ wss.on("connection", (socket, req) => {
             socket.close();
           }
 
-          rooms.set(parsedData.roomId, [...users, { userId, ws: socket }]);
+          const currentUsers = rooms.get(parsedData.roomId) || [];
+          rooms.set(parsedData.roomId, [
+            ...currentUsers,
+            { userId, ws: socket },
+          ]);
           break;
         case "LEAVE_ROOM":
           const newUsers = users.filter((user) => user.userId !== userId);

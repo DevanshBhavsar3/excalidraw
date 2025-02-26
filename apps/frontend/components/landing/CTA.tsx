@@ -18,15 +18,13 @@ export function CTA() {
             Sign Up Now <IoIosArrowRoundForward size={32} />
           </Link>
         </div>
-        <div className="w-1/2">
-          <Image
-            src={"/image1.jpeg"}
-            alt="abstaract_waves"
-            width={600}
-            height={600}
-            className="rounded-md"
-          />
-        </div>
+        <Image
+          src={"/image1.jpeg"}
+          alt="abstaract_waves"
+          width={600}
+          height={600}
+          className="rounded-md"
+        />
       </div>
     </section>
   );

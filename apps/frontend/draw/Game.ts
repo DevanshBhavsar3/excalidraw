@@ -121,9 +121,6 @@ export class Game {
 
             alert(errorMessage);
             break;
-          case "UPDATE_USERS":
-            console.log(data.users);
-            break;
         }
 
         this.clearCanvas();
@@ -148,12 +145,12 @@ export class Game {
     });
   }
 
-  sendSocketMessage(type: string, message: any) {
+  sendSocketMessage(type: string, message: string) {
     this.socket.send(
       JSON.stringify({
         type,
         roomId: this.roomId,
-        message: JSON.stringify(message),
+        message: message,
       })
     );
   }
@@ -263,7 +260,10 @@ export class Game {
     this.canvas.style.cursor = "default";
 
     if (this.isDrawing) {
-      this.sendSocketMessage("CHAT", this.selectedShape.getProperties());
+      this.sendSocketMessage(
+        "CHAT",
+        JSON.stringify(this.selectedShape.getProperties())
+      );
 
       this.isDrawing = false;
       this.selectedShape = null;
@@ -272,10 +272,13 @@ export class Game {
     }
 
     if (this.isResizing) {
-      this.sendSocketMessage("UPDATE", {
-        id: this.selectedShape.id,
-        shape: this.selectedShape.getProperties(),
-      });
+      this.sendSocketMessage(
+        "UPDATE",
+        JSON.stringify({
+          id: this.selectedShape.id,
+          shape: this.selectedShape.getProperties(),
+        })
+      );
 
       this.isResizing = false;
       this.selectedShape.closeResize();
@@ -324,9 +327,12 @@ export class Game {
 
   deleteShape() {
     if (this.selectedShape) {
-      this.sendSocketMessage("DELETE", {
-        id: this.selectedShape.id,
-      });
+      this.sendSocketMessage(
+        "DELETE",
+        JSON.stringify({
+          id: this.selectedShape.id,
+        })
+      );
       this.selectedShape = null;
       this.updateState();
       this.clearCanvas();

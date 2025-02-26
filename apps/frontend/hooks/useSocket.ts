@@ -35,6 +35,7 @@ export function useSocket(roomId: number) {
             roomId,
           })
         );
+        socket.close();
       }
     };
   }, []);
