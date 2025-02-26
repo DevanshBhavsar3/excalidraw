@@ -29,7 +29,12 @@ export function useSocket(roomId: number) {
 
     return () => {
       if (socket.readyState === socket.OPEN) {
-        socket.close();
+        socket.send(
+          JSON.stringify({
+            type: "LEAVE_ROOM",
+            roomId,
+          })
+        );
       }
     };
   }, []);

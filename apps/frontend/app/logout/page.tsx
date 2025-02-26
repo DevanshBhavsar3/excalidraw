@@ -10,7 +10,7 @@ export default function LogoutPage() {
     localStorage.removeItem("token");
 
     setTimeout(() => router.push("/"), 3000);
-  }, []);
+  }, [router]);
 
   return (
     <div className="h-screen flex flex-col justify-center items-center gap-3">

@@ -73,7 +73,7 @@ export function AuthPage({ page }: { page: "signup" | "login" }) {
 
         {page === "login" ? (
           <p className="text-sm">
-            Don't have an account?{" "}
+            {"Don't have an account? "}
             <Link href={"/signup"} className="underline">
               Create Account
             </Link>

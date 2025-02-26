@@ -1,11 +1,19 @@
 "use client";
 
 import Icon from "@/public/icon";
-import { link } from "fs";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export function Navbar() {
-  const token = localStorage.getItem("token");
+  const [token, setToken] = useState<string>("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      setToken(token);
+    }
+  }, [token]);
 
   let links;
 

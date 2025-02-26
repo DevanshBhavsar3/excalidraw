@@ -1,5 +1,5 @@
 import { Chat, Point, ShapeConfig, ShapeType, State, Tools } from "@/types";
-import { getShapes } from "./http";
+import { getShapes } from "../http";
 import { Rectangle } from "./Rectangle";
 import { Circle } from "./Circle";
 import { Line } from "./Line";
@@ -120,6 +120,10 @@ export class Game {
             const errorMessage = data.message;
 
             alert(errorMessage);
+            break;
+          case "UPDATE_USERS":
+            console.log(data.users);
+            break;
         }
 
         this.clearCanvas();

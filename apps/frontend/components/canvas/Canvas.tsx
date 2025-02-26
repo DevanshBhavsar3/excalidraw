@@ -28,6 +28,9 @@ export function Canvas({
   socket: WebSocket;
   roomId: number;
 }) {
+  const [users, setUsers] = useState<{ userId: string; username: string }[]>(
+    []
+  );
   const [game, setGame] = useState<Game>();
   const [currentState, setCurrentState] = useState<State>({
     tool: Tools.Cursor,
@@ -50,12 +53,8 @@ export function Canvas({
 
       setGame(game);
       didInit.current = true;
-
-      return () => {
-        game.destroy();
-      };
     }
-  }, [canvasRef, game]);
+  }, [canvasRef, game, roomId, socket]);
 
   function changeTool(tool: Tools) {
     if (game) {
@@ -108,11 +107,21 @@ export function Canvas({
     <div>
       <Link
         href={"/dashboard"}
-        className="fixed top-5 left-5 p-1 border border-primary hover:bg-primary rounded-md flex justify-center items-center hover:text-white cursor-pointer transition-all"
+        className="fixed z-10 top-5 left-5 p-1 border border-primary bg-white hover:bg-primary rounded-md flex justify-center items-center hover:text-white cursor-pointer transition-all"
       >
         <MdOutlineKeyboardArrowLeft size={24} />
       </Link>
       <canvas ref={canvasRef} className="h-screen w-screen"></canvas>
+
+      {/* Users */}
+      <div className="fixed top-5 right-5">
+        {users.map((user, index) => (
+          <span key={index} className="text-xl text-black">
+            {user.username}
+          </span>
+        ))}
+      </div>
+
       {/* Config options */}
       {currentState?.tool !== Tools.Cursor &&
         currentState?.tool !== Tools.Hand &&

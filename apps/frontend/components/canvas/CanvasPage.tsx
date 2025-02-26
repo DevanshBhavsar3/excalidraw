@@ -13,7 +13,6 @@ export function CanvasPage({ roomId }: { roomId: number }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     setToken(token || "");
   }, []);
 

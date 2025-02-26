@@ -3,7 +3,11 @@ import { HTTP_URL } from "@/config";
 import axios from "axios";
 import Link from "next/link";
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const slug = (await params).slug;
 
   try {
@@ -12,6 +16,8 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
     return <CanvasPage roomId={roomId} />;
   } catch (e) {
+    console.log(e);
+
     return (
       <div className="h-screen flex flex-col justify-center items-center gap-3">
         <p className="text-3xl">Invalid Room Name</p>
