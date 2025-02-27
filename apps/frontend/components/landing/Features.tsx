@@ -33,16 +33,16 @@ export function Features() {
 
   return (
     <section className="z-10 py-10 border-b">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold py-10">Features</h1>
-        <div className="flex justify-between items-start gap-10 h-fit relative mb-20">
+      <div className="max-w-7xl mx-auto p-2">
+        <h1 className="text-xl md:text-3xl font-bold py-10">Features</h1>
+        <div className="flex flex-col md:flex-row justify-between items-start gap-24 md:gap-10 h-fit mb-20">
           {/* Video frame */}
-          <div className="sticky top-32 left-0 h-fit w-1/2 rounded-md aspect-video">
-            <div className="border border-blue-500 p-4">
-              <div className="border border-cyan-500 p-4">
+          <div className="bg-white sticky top-16 md:top-32 z-30 left-0 md:h-fit h-fit w-full md:w-1/2 rounded-md">
+            <div className="border border-blue-500 p-2 md:p-4 h-fit">
+              <div className="border border-cyan-500 p-2 md:p-4 h-fit">
                 <video
                   src="/demo.mp4"
-                  className="h-full w-full border border-primary"
+                  className="h-full w-full border border-primary aspect-video"
                   autoPlay
                   muted
                   loop
@@ -54,15 +54,15 @@ export function Features() {
           </div>
 
           {/* Text frame */}
-          <div className="w-1/2 flex flex-col gap-10">
+          <div className="md:w-1/2 w-full h-fit flex flex-col gap-10">
             {tabs.map((tab, index) => (
               <div
                 key={index}
-                className="py-32 p-10 sticky top-32 right-0 h-fit flex flex-col justify-center items-start gap-3 bg-white border-t-2"
+                className="p-5 md:p-10 sticky top-1/2 md:top-32 right-0 h-60 flex flex-col justify-center items-start gap-3 bg-white border-t-2"
               >
                 {tab.icon}
-                <p className="text-xl font-semibold">{tab.title}</p>
-                <p className="text-md max-w-lg">{tab.description}</p>
+                <p className="text-lg md:text-xl font-semibold">{tab.title}</p>
+                <p className="text-sm md:text-md max-w-lg">{tab.description}</p>
               </div>
             ))}
           </div>
