@@ -107,9 +107,9 @@ export function Canvas({
     <div>
       <Link
         href={"/dashboard"}
-        className="fixed z-10 top-5 left-5 p-1 border border-primary bg-white hover:bg-primary rounded-md flex justify-center items-center hover:text-white cursor-pointer transition-all"
+        className="fixed z-10 top-5 left-5 p-2 border border-primary bg-white hover:bg-primary rounded-md flex justify-center items-center hover:text-white cursor-pointer transition-all"
       >
-        <MdOutlineKeyboardArrowLeft size={24} />
+        <MdOutlineKeyboardArrowLeft size={18} />
       </Link>
       <canvas ref={canvasRef} className="h-screen w-screen"></canvas>
 
@@ -253,7 +253,7 @@ function ToolbarButton({
   return (
     <button
       onClick={onClick}
-      className={`${isSelected ? "bg-primary text-white" : "hover:bg-primary/30"} p-2 rounded-md `}
+      className={`${isSelected ? "bg-primary text-white" : "hover:bg-primary/30"} p-1 md:p-2 rounded-md `}
     >
       {children}
     </button>

@@ -31,7 +31,7 @@ export function CanvasPage({ roomId }: { roomId: number }) {
         <Navbar />
         <div className="h-screen flex flex-col justify-center items-center">
           <p className="text-2xl">Please log in.</p>
-          <p>
+          <p className="text-md">
             Go to{" "}
             <Link href={"/login"} className="text-blue-500 underline">
               Log In

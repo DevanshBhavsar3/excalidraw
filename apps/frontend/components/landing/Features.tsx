@@ -54,11 +54,11 @@ export function Features() {
           </div>
 
           {/* Text frame */}
-          <div className="md:w-1/2 w-full h-fit flex flex-col gap-10">
+          <div className="md:w-1/2 w-full h-fit flex flex-col gap-10 divide-y">
             {tabs.map((tab, index) => (
               <div
                 key={index}
-                className="p-5 md:p-10 sticky top-1/2 md:top-32 right-0 h-60 flex flex-col justify-center items-start gap-3 bg-white border-t-2"
+                className="p-5 md:p-10 sticky top-1/2 md:top-32 right-0 h-72 flex flex-col justify-center items-start gap-3 bg-white"
               >
                 {tab.icon}
                 <p className="text-lg md:text-xl font-semibold">{tab.title}</p>

@@ -20,8 +20,8 @@ export default async function Page({
 
     return (
       <div className="h-screen flex flex-col justify-center items-center gap-3">
-        <p className="text-3xl">Invalid Room Name</p>
-        <p>
+        <p className="text-2xl">Invalid Room Name</p>
+        <p className="text-md">
           Go to{" "}
           <Link href={"/dashboard"} className="underline text-blue-500">
             dashboard

@@ -40,30 +40,32 @@ export function AuthPage({ page }: { page: "signup" | "login" }) {
     <section>
       <Navbar />
       <form
-        className="h-screen flex flex-col justify-center items-start gap-3 w-1/4 mx-auto"
+        className="h-screen flex flex-col justify-center items-start p-2 md:w-1/4 gap-3 mx-auto"
         onSubmit={handleSubmit}
       >
-        <p className="text-xl font-semibold flex justify-center items-center gap-3">
+        <p className="md:text-xl font-semibold flex justify-center items-center gap-3">
           <Icon size="md" />
           {page === "signup" ? "Sign Up" : "Log In"}
         </p>
         <div className="flex flex-col justify-center items-start w-full">
-          <label htmlFor="">Username</label>
+          <label htmlFor="username" className="text-sm">
+            Username
+          </label>
           <input
             type="text"
-            name=""
-            id=""
+            id="username"
             placeholder="Username"
             className="px-4 py-2 border bg-gray-100 rounded-md w-full"
             onChange={(e) => (usernameRef.current = e.target.value)}
           />
         </div>
         <div className="flex flex-col justify-center items-start w-full">
-          <label htmlFor="">Password</label>
+          <label htmlFor="password" className="text-sm">
+            Password
+          </label>
           <input
             type="text"
-            name=""
-            id=""
+            id="password"
             placeholder="Password"
             className="px-4 py-2 border bg-gray-100 rounded-md w-full"
             onChange={(e) => (passwordRef.current = e.target.value)}
@@ -87,7 +89,7 @@ export function AuthPage({ page }: { page: "signup" | "login" }) {
           </p>
         )}
         <button
-          className="hover:bg-primary border border-primary hover:text-white px-4 py-2 rounded-full w-full"
+          className="hover:bg-primary border border-primary hover:text-white px-4 py-1 md:py-2 rounded-full w-full"
           type="submit"
         >
           {page === "login" ? "Log in" : "Sign up"}

@@ -88,12 +88,13 @@ export default function DashboardPage() {
       )}
 
       <Navbar />
-      <div className="max-w-7xl w-full mx-auto my-5">
-        <p className="text-2xl font-semibold mb-3">Join Room</p>
-        <form className="w-full flex justify-center items-center mb-5">
+      <div className="max-w-7xl w-full mx-auto my-5 px-2">
+        {/* Join room */}
+        <p className="text-md md:text-xl font-semibold mb-3">Join Room</p>
+        <form className="w-full flex justify-center items-center mb-5 h-7 md:h-10">
           <input
             type="text"
-            className="rounded-l-md px-4 py-2 flex-1 border"
+            className="rounded-l-md px-4 py-1 md:py-2 flex-1 border text-sm h-full"
             placeholder="Room name"
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               (joinRoomRef.current = e.target.value)
@@ -105,28 +106,39 @@ export default function DashboardPage() {
               router.push(`/room/${joinRoomRef.current}`);
             }}
             disabled={loading}
-            className="bg-primary text-white px-4 py-2 rounded-r-md w-[10%] disabled:bg-primary/40 transition-all"
+            className="bg-primary text-white px-4 py-1 md:py-2 rounded-r-md w-[30%] md:w-[10%] disabled:bg-primary/40 transition-all text-sm text-center h-full flex justify-center items-center"
           >
             Join
           </button>
         </form>
 
-        <p className="text-2xl font-semibold mb-3">
+        <p className="text-md md:text-xl font-semibold mb-3">
           Your Rooms ({rooms.length})
         </p>
         <div className="rounded-md">
-          <ul className="flex flex-col w-full justify-start items-center border rounded-md overflow-y-auto h-[calc(100vh-15rem)] relative">
-            <li className="sticky top-0 left-0 flex w-full text-md font-medium border-b bg-gray-100">
-              <div className="w-[20%] px-4 py-2">Id</div>
-              <div className="border-x w-[40%] px-4 py-2">Name</div>
-              <div className="border-r w-[30%] px-4 py-2">Created At</div>
-              <div className="w-[10%] px-4 py-2 text-center">Join</div>
+          <ul className="flex flex-col w-full justify-start items-center border rounded-md overflow-y-auto h-[calc(100vh-15rem)] relative divide-y">
+            <li className="sticky top-0 left-0 flex w-full text-md font-medium divide-x bg-gray-100">
+              <div className="w-[15%] p-1 md:px-4 md:py-2 text-center">Id</div>
+              <div className="w-[40%] p-1 md:px-4 md:py-2 text-center">
+                Name
+              </div>
+              <div className="w-[30%] p-1 md:px-4 md:py-2 text-center">
+                Created At
+              </div>
+              <div className="w-[15%] p-1 md:px-4 md:py-2 text-center">
+                Join
+              </div>
             </li>
+            {/* Rooms */}
             {rooms.map((room) => (
-              <li key={room.id} className="flex w-full border-b-2">
-                <div className="w-[20%] px-4 py-2">{room.id}</div>
-                <div className="border-x-2 w-[40%] px-4 py-2">{room.slug}</div>
-                <div className="border-r w-[30%] px-4 py-2">
+              <li key={room.id} className="flex w-full divide-x">
+                <div className="w-[15%] p-1 md:px-4 md:py-2 text-center text-sm truncate">
+                  {room.id}
+                </div>
+                <div className="w-[40%] p-1 md:px-4 md:py-2 text-center text-sm truncate">
+                  {room.slug}
+                </div>
+                <div className="w-[30%] p-1 md:px-4 md:py-2 text-center text-sm truncate">
                   {new Date(room.createdAt).toLocaleString()}
                 </div>
                 <button
@@ -134,9 +146,9 @@ export default function DashboardPage() {
                     setLoading(true);
                     redirect(`/room/${room.slug}`);
                   }}
-                  className="w-[10%] px-4 py-2 flex justify-center items-center hover:text-primary text-black/50 transition-all"
+                  className="w-[15%] p-1 md:px-4 md:py-2 text-center flex justify-center items-center hover:text-primary text-black/50 transition-all"
                 >
-                  <FaPlay size={18} />
+                  <FaPlay size={14} />
                 </button>
               </li>
             ))}
@@ -145,10 +157,11 @@ export default function DashboardPage() {
               {rooms.length === 0 && <div>No rooms!</div>}
             </li>
 
-            <form className="sticky bg-white left-0 bottom-0 w-full flex justify-center border-t items-start">
+            {/* Create room */}
+            <form className="sticky bg-white left-0 bottom-0 w-full flex justify-center border-none items-start h-7 md:h-10">
               <input
                 type="text"
-                className="rounded-bl-md px-4 py-2 flex-1"
+                className="rounded-l-md px-4 py-1 md:py-2 flex-1 border text-sm h-full"
                 placeholder="Room name"
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   (createRoomRef.current = e.target.value)
@@ -157,7 +170,7 @@ export default function DashboardPage() {
               <button
                 onClick={createRoom}
                 disabled={loading}
-                className="bg-primary text-white px-4 py-2 rounded-br-md w-[10%] disabled:bg-primary/40 transition-all"
+                className="bg-primary text-white px-4 py-1 md:py-2 rounded-r-md w-[30%] md:w-[10%] disabled:bg-primary/40 transition-all text-sm text-center h-full flex justify-center items-center"
               >
                 Create
               </button>

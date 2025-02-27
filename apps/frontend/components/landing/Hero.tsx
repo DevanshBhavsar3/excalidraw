@@ -5,7 +5,7 @@ import { IoIosArrowRoundForward } from "react-icons/io";
 export function Hero() {
   return (
     <section className="z-10 flex flex-col items-center text-center relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full bg-[url('/bg.png')] scale-150 bg-no-repeat bg-contain bg-center"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-[url('/bg-mobile.png')] md:bg-[url('/bg.png')] scale-150 bg-no-repeat bg-cover md:bg-contain bg-center"></div>
       <div className="z-10 py-44 flex flex-col items-center text-center">
         <div className="flex justify-center items-center gap-1">
           <Icon size="sm" />
