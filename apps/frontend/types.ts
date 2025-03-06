@@ -23,6 +23,7 @@ export enum Tools {
   Circle = "Circle",
   Line = "Line",
   Pencil = "Pencil",
+  AI = "AI",
 }
 
 export type RectangleType = {

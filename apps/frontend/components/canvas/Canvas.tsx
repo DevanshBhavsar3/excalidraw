@@ -19,7 +19,9 @@ import { CgShapeZigzag } from "react-icons/cg";
 import { CgViewMonth } from "react-icons/cg";
 import { TfiLineDashed } from "react-icons/tfi";
 import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
+import { GiFallingStar } from "react-icons/gi";
 import Link from "next/link";
+import { AIModal } from "./AIModal";
 
 export function Canvas({
   socket,
@@ -28,9 +30,6 @@ export function Canvas({
   socket: WebSocket;
   roomId: number;
 }) {
-  const [users, setUsers] = useState<{ userId: string; username: string }[]>(
-    []
-  );
   const [game, setGame] = useState<Game>();
   const [currentState, setCurrentState] = useState<State>({
     tool: Tools.Cursor,
@@ -82,6 +81,7 @@ export function Canvas({
     { icon: <BiCircle size={18} />, type: Tools.Circle },
     { icon: <TfiLayoutLineSolid size={18} />, type: Tools.Line },
     { icon: <BiPencil size={18} />, type: Tools.Pencil },
+    { icon: <GiFallingStar size={18} />, type: Tools.AI },
   ];
 
   const fillStyles = [
@@ -113,19 +113,11 @@ export function Canvas({
       </Link>
       <canvas ref={canvasRef} className="h-screen w-screen"></canvas>
 
-      {/* Users */}
-      <div className="fixed top-5 right-5">
-        {users.map((user, index) => (
-          <span key={index} className="text-xl text-black">
-            {user.username}
-          </span>
-        ))}
-      </div>
-
       {/* Config options */}
       {currentState?.tool !== Tools.Cursor &&
         currentState?.tool !== Tools.Hand &&
-        currentState?.tool !== Tools.Pencil && (
+        currentState?.tool !== Tools.Pencil &&
+        currentState?.tool !== Tools.AI && (
           <div className="z-10 absolute left-5 px-4 py-2 top-1/2 -translate-y-1/2 bg-white border border-primary flex flex-col gap-3 rounded-md">
             <div>
               <p className="text-sm font-medium">
@@ -146,13 +138,7 @@ export function Canvas({
               <input
                 type="color"
                 value={currentState.config.fill}
-                onChange={(e) => {
-                  if (e.target.value === "#ffffff") {
-                    changeConfig("fill", "rgba(0,0,0,0)");
-                  } else {
-                    changeConfig("fill", e.target.value);
-                  }
-                }}
+                onChange={(e) => changeConfig("fill", e.target.value)}
               />
             </div>
             <div>
@@ -237,6 +223,10 @@ export function Canvas({
           <BiPlus size={24} />
         </button>
       </div>
+
+      {currentState.tool === Tools.AI && game && (
+        <AIModal canvas={game} closeModal={() => changeTool(Tools.Cursor)} />
+      )}
     </div>
   );
 }

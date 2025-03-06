@@ -66,7 +66,7 @@ export class Game {
       this.canvas.height = window.innerHeight;
       this.canvas.style.cursor = "default";
       this.ctx.strokeStyle = "#000000";
-      this.ctx.fillStyle = "#ffffff";
+      this.ctx.fillStyle = "rgba(0, 0, 0, 0)";
       this.ctx.lineWidth = 2;
 
       this.clearCanvas();
@@ -293,10 +293,22 @@ export class Game {
     this.canvas.addEventListener("mousemove", (e) => this.mouseMove(e));
     this.canvas.addEventListener("mouseup", (e) => this.mouseUp(e));
 
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Delete") {
+        this.deleteShape();
+      }
+    });
+
     this.canvas.addEventListener("wheel", (e) => {
       e.preventDefault();
       const scale = e.deltaY * 0.001;
       this.zoom(scale, e);
+    });
+  }
+
+  addShapes(shapes: ShapeType[]) {
+    shapes.forEach((shape) => {
+      this.sendSocketMessage("CHAT", JSON.stringify(shape));
     });
   }
 

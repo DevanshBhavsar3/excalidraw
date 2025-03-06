@@ -10,6 +10,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { authMiddleware } from "./authMiddleware";
 import cors from "cors";
+import { model } from "./ai";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -167,6 +168,20 @@ app.get("/user/rooms", authMiddleware, async (req, res) => {
     });
 
     res.json(room);
+  } catch (e) {
+    res.status(500).json({ error: "Something went wrong." });
+    return;
+  }
+});
+
+app.post("/generate", authMiddleware, async (req, res) => {
+  const prompt = req.body.prompt;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const shapes = result.response.text();
+
+    res.json(shapes);
   } catch (e) {
     res.status(500).json({ error: "Something went wrong." });
     return;
