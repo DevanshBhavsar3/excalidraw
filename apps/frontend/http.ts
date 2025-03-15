@@ -1,10 +1,10 @@
-import { HTTP_URL } from "@/config";
+import { HTTP_CLIENT_URL } from "@/config";
 import { Chat } from "@/types";
 import axios, { AxiosError } from "axios";
 
 export async function getShapes(roomId: number) {
   try {
-    const response = await axios.get(`${HTTP_URL}/chats/${roomId}`, {
+    const response = await axios.get(`${HTTP_CLIENT_URL}/chats/${roomId}`, {
       headers: {
         Authorization: localStorage.getItem("token"),
       },

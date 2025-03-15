@@ -1,4 +1,4 @@
-import { WEBSOCKET_URL } from "@/config";
+import { WS_CLIENT_URL } from "@/config";
 import { useEffect, useState } from "react";
 
 export function useSocket(roomId: number) {
@@ -13,7 +13,7 @@ export function useSocket(roomId: number) {
       return;
     }
 
-    const socket = new WebSocket(`${WEBSOCKET_URL}?token=${token}`);
+    const socket = new WebSocket(`${WS_CLIENT_URL}?token=${token}`);
 
     socket.onopen = () => {
       setSocket(socket);

@@ -3,7 +3,7 @@
 import Icon from "@/public/icon";
 import Link from "next/link";
 import axios, { AxiosError } from "axios";
-import { HTTP_URL } from "@/config";
+import { HTTP_CLIENT_URL } from "@/config";
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
@@ -19,7 +19,7 @@ export function AuthPage({ page }: { page: "signup" | "login" }) {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${HTTP_URL}/${page}`, {
+      const response = await axios.post(`${HTTP_CLIENT_URL}/${page}`, {
         username: usernameRef.current,
         password: passwordRef.current,
       });

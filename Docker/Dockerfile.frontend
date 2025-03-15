@@ -1,0 +1,19 @@
+FROM node:22-alpine
+ARG NEXT_PUBLIC_HTTP_URL
+
+ENV NEXT_PUBLIC_HTTP_URL=${NEXT_PUBLIC_HTTP_URL}
+
+WORKDIR /src
+
+RUN npm i -g pnpm
+
+COPY ./packages ./packages
+COPY ./package.json ./pnpm-lock.yaml ./pnpm-workspace.yaml ./turbo.json ./
+COPY ./apps/frontend ./apps/frontend
+
+RUN pnpm install
+RUN pnpm run build:frontend
+
+EXPOSE 3000
+
+CMD ["pnpm", "run", "start:frontend"]

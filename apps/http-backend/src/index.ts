@@ -40,7 +40,8 @@ app.post("/signup", async (req, res) => {
 
     res.json({ token });
   } catch (e) {
-    res.status(400).json({ error: "Username already exists." });
+    console.log(e);
+    res.status(400).json({ error: "Something went wrong." });
   }
 });
 
@@ -79,6 +80,7 @@ app.post("/login", async (req, res) => {
 
     res.json({ token });
   } catch (e) {
+    console.log(e);
     res.status(500).json({ error: "Something went wrong." });
     return;
   }

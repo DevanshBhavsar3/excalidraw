@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=secret
+    ports:
+      - 5432:5432
+    
+  frontend:
+    build:
+      context: .
+      dockerfile: ./Docker/Dockerfile.frontend
+      args:
+        - NEXT_PUBLIC_HTTP_URL=http://http-backend:3001
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+      - http-backend
+      - websocket-backend
+
+  http-backend:
+    build: 
+      context: .
+      dockerfile: ./Docker/Dockerfile.http-backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:secret@postgres:5432/postgres
+      - GEN_AI_API_KEY=dsfsd
+    ports:
+      - 3001:3001
+    depends_on: 
+      - postgres
+
+  websocket-backend:
+    build: 
+      context: .
+      dockerfile: ./Docker/Dockerfile.websocket-backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:secret@postgres:5432/postgres
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
