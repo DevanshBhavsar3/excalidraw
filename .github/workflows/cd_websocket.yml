@@ -1,4 +1,4 @@
-name: HTTP Backend Deployment
+name: Websocket Backend Deployment
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./docker/Dockerfile.http-backend
+          file: ./Docker/Dockerfile.http-backend
           push: true
           tags: devanshbhavsar/drawify-websocket-backend:${{ github.sha }}
 

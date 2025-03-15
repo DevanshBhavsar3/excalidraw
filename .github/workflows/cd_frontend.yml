@@ -22,7 +22,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./docker/Dockerfile.frontend
+          file: ./Docker/Dockerfile.frontend
           build-args: |
             HTTP_URL=http://localhost:3001
             WS_URL=ws://localhost:8080
