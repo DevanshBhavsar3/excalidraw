@@ -4,7 +4,7 @@ import { Game } from "@/draw/Game";
 import axios from "axios";
 import { FormEvent, useRef, useState } from "react";
 import { IoIosCloseCircleOutline } from "react-icons/io";
-import { HTTP_CLIENT_URL } from "../../config";
+import { HTTP_URL } from "../../config";
 
 export function AIModal({
   canvas,
@@ -24,7 +24,7 @@ export function AIModal({
     try {
       setLoading(true);
       const response = await axios.post(
-        `${HTTP_CLIENT_URL}/generate`,
+        `${HTTP_URL}/generate`,
         { prompt },
         {
           headers: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { HTTP_CLIENT_URL } from "@/config";
+import { HTTP_URL } from "@/config";
 import axios, { AxiosError } from "axios";
 import { redirect, useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -33,7 +33,7 @@ export default function DashboardPage() {
 
     async function getRoom() {
       try {
-        const response = await axios.get(`${HTTP_CLIENT_URL}/user/rooms`, {
+        const response = await axios.get(`${HTTP_URL}/user/rooms`, {
           headers: {
             Authorization: token,
           },
@@ -55,7 +55,7 @@ export default function DashboardPage() {
 
     try {
       await axios.post(
-        `${HTTP_CLIENT_URL}/create`,
+        `${HTTP_URL}/create`,
         {
           name: createRoomRef.current,
         },

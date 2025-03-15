@@ -16,6 +16,7 @@ export default async function Page({
 
     return <CanvasPage roomId={roomId} />;
   } catch (e) {
+    console.log(HTTP_URL);
     console.log(e);
 
     return (

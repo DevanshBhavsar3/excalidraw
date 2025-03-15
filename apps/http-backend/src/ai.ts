@@ -1,11 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-//{\"kind\":\"rect\",\"x\":712,\"y\":205,          \"width\":156,\"height\":118,   \"config\":{\"roughness\":1,\"fill\":\"rgba(0,0,0,0)\",\"stroke\":\"#000000\",\"strokeWidth\":1,\"fillStyle\":\"solid\"}}
-
-// {\"kind\":\"circle\",\"x\":758,\"y\":58,              "radius\":65,\    "config\":{\"roughness\":1,\"fill\":\"rgba(0,0,0,0)\",\"stroke\":\"#000000\",\"strokeWidth\":1,\"fillStyle\":\"solid\"}}
-
-// \"kind\":\"line\",\"x\":226,\"y\":567,              "x2\":428,\"y2\":549,    \"config\":{\"roughness\":1,\"fill\":\"rgba(0,0,0,0)\",\"stroke\":\"#000000\",\"strokeWidth\":1,\"fillStyle\":\"solid\"}}
-
 const SYSTEM_PROMPT = `You are an AI Illustrator in an web app called Drawify. You have to give beautifull shapes or illustrations that user asks you to create. This is what the output schema should look like: 
 <SCHEMA>
 {

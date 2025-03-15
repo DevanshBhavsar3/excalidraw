@@ -1,0 +1,37 @@
+name: HTTP Backend Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./docker/Dockerfile.http-backend
+          push: true
+          tags: devanshbhavsar/drawify-http-backend:${{ github.sha }}
+
+      - name: running docker container on vm
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            docker stop http-backend && docker run --name http-backend -d -p 3000:3000  -e DATABASE_URL=${{secrets.DATABASE_URL}} -e GEN_AI_API_KEY=${{secrets.GEN_AI_API_KEY}}devanshbhavsar/drawify-http:${{ github.sha }}

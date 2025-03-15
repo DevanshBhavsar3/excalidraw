@@ -10,10 +10,9 @@ COPY ./apps/http-backend ./apps/http-backend
 
 RUN pnpm install
 
-RUN pnpm run build:http
-
 ENV PORT=3001
-ENV GOOGLE_GENERATIVE_AI_API_KEY=${GEN_AI_API_KEY}
+
+RUN pnpm run build:http
 
 EXPOSE 3001
 
