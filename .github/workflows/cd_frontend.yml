@@ -37,4 +37,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            docker stop frontend && docker run --name frontend -d -p 3000:3000 devanshbhavsar/drawify-frontend:${{ github.sha }}
+            sudo docker stop frontend && sudo docker run --name frontend -d -p 3000:3000 devanshbhavsar/drawify-frontend:${{ github.sha }}
