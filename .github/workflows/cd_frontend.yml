@@ -37,7 +37,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            sudo docker kill frontend
-            sudo docker rm frontend
-            sudo docker pull devanshbhavsar/drawify-frontend:${{ github.sha }}
-            sudo docker run --name frontend -d -p 3000:3000 devanshbhavsar/drawify-frontend:${{ github.sha }}
+            docker pull devanshbhavsar/drawify-frontend:${{ github.sha }}
+            docker run --add-host=localhost:host-gateway -d -p 3000:3000 devanshbhavsar/drawify-frontend:${{ github.sha }}

@@ -34,7 +34,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            sudo docker kill ws-backend
-            sudo docker rm ws-backend
-            sudo docker pull devanshbhavsar/drawify-websocket-backend:${{ github.sha }}
-            sudo docker run --name ws-backend -d -p 8080:8080 -e DATABASE_URL=${{secrets.DATABASE_URL}} devanshbhavsar/drawify-websocket-backend:${{ github.sha }}
+            docker pull devanshbhavsar/drawify-websocket-backend:${{ github.sha }}
+            docker run -d -p 8080:8080 -e DATABASE_URL=${{secrets.DATABASE_URL}} devanshbhavsar/drawify-websocket-backend:${{ github.sha }}

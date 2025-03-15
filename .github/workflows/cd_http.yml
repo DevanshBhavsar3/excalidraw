@@ -34,7 +34,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            sudo docker kill http-backend
-            sudo docker rm http-backend
-            sudo docker pull devanshbhavsar/drawify-http-backend:${{ github.sha }}
-            sudo docker run --name http-backend -d -p 3001:3001 -e DATABASE_URL=${{secrets.DATABASE_URL}} -e GEN_AI_API_KEY=${{secrets.GEN_AI_API_KEY}} devanshbhavsar/drawify-http-backend:${{ github.sha }}
+            docker pull devanshbhavsar/drawify-http-backend:${{ github.sha }}
+            docker run -d -p 3001:3001 -e DATABASE_URL=${{secrets.DATABASE_URL}} -e GEN_AI_API_KEY=${{secrets.GEN_AI_API_KEY}} devanshbhavsar/drawify-http-backend:${{ github.sha }}
