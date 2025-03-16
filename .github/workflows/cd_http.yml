@@ -43,4 +43,4 @@ jobs:
             docker rm http-backend || true
             docker image prune -f
             docker pull devanshbhavsar/drawify-http-backend:latest
-            docker run -d -p 3001:3001 --name http-backend -e DATABASE_URL=${{secrets.DATABASE_URL}} -e GEN_AI_API_KEY=${{secrets.GEN_AI_API_KEY}} devanshbhavsar/drawify-http-backend:latest
+            docker run -d -p 3001:3001 --name http-backend -e DATABASE_URL=${{secrets.DATABASE_URL}} -e GOOGLE_GENERATIVE_AI_API_KEY=${{secrets.GEN_AI_API_KEY}} devanshbhavsar/drawify-http-backend:latest

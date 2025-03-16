@@ -32,7 +32,7 @@ services:
       dockerfile: ./Docker/Dockerfile.http-backend
     environment:
       - DATABASE_URL=${DATABASE_URL}
-      - GEN_AI_API_KEY=${GEN_AI_API_KEY}
+      - GOOGLE_GENERATIVE_AI_API_KEY=${GEN_AI_API_KEY}
     ports:
       - 3001:3001
     depends_on: 
