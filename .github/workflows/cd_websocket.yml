@@ -1,13 +1,16 @@
 name: Websocket Backend Deployment
 
 on:
-  push:
+  workflow_run:
+    workflows: ["DB Migrations"]
+    types: completed
     branches:
       - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2

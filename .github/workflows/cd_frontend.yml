@@ -1,13 +1,17 @@
 name: Frontend Deployment
 
 on:
-  push:
+  workflow_run:
+    workflows: ["HTTP Backend Deployment", "WebSocket Backend Deployment"]
+    types:
+      - completed
     branches:
       - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
