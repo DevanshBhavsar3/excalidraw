@@ -39,4 +39,4 @@ jobs:
           port: 22
           script: |
             docker pull devanshbhavsar/drawify-frontend:${{ github.sha }}
-            docker run -d -p 3000:3000 devanshbhavsar/drawify-frontend:${{ github.sha }}
+            docker run -d -p 3000:3000 -e DATABASE_URL=${{secrets.DATABASE_URL}} devanshbhavsar/drawify-frontend:${{ github.sha }}
