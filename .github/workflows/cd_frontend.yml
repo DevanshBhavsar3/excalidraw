@@ -26,6 +26,7 @@ jobs:
           build-args: |
             HTTP_URL=http://localhost:3001
             WS_URL=ws://localhost:8080
+          add-hosts: localhost:host-gateway
           push: true
           tags: devanshbhavsar/drawify-frontend:${{ github.sha }}
 
@@ -38,4 +39,4 @@ jobs:
           port: 22
           script: |
             docker pull devanshbhavsar/drawify-frontend:${{ github.sha }}
-            docker run --add-host=localhost:host-gateway -d -p 3000:3000 devanshbhavsar/drawify-frontend:${{ github.sha }}
+            docker run -d -p 3000:3000 devanshbhavsar/drawify-frontend:${{ github.sha }}
