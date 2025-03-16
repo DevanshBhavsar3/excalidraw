@@ -5,8 +5,7 @@ WORKDIR /app
 RUN npm i -g pnpm
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
-
-COPY ./packages/db ./packages/db
+COPY ./packages ./packages
 
 RUN pnpm install
 
