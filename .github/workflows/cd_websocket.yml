@@ -25,7 +25,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Docker/Dockerfile.http-backend
+          file: ./Docker/Dockerfile.websocket-backend
           push: true
           tags: |
             devanshbhavsar/drawify-websocket-backend:latest
