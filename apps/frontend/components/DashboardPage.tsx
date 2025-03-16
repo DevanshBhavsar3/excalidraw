@@ -3,10 +3,11 @@
 import { HTTP_URL } from "@/config";
 import axios, { AxiosError } from "axios";
 import { redirect, useRouter } from "next/navigation";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FaPlay } from "react-icons/fa";
+import { CreateRoomSchema } from "@repo/common/types";
 
 interface Room {
   id: number;
@@ -50,14 +51,25 @@ export default function DashboardPage() {
     getRoom();
   }, []);
 
-  async function createRoom() {
+  async function createRoom(e: FormEvent) {
+    e.preventDefault();
+
+    const parsedBody = CreateRoomSchema.safeParse({
+      name: createRoomRef.current,
+    });
+
+    if (!parsedBody.success) {
+      setError(parsedBody.error.errors[0].message);
+      return;
+    }
+
     setLoading(true);
 
     try {
       await axios.post(
         `${HTTP_URL}/create`,
         {
-          name: createRoomRef.current,
+          name: parsedBody.data.name,
         },
         {
           headers: {

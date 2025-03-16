@@ -81,7 +81,7 @@ export function Canvas({
     { icon: <BiCircle size={18} />, type: Tools.Circle },
     { icon: <TfiLayoutLineSolid size={18} />, type: Tools.Line },
     { icon: <BiPencil size={18} />, type: Tools.Pencil },
-    { icon: <GiFallingStar size={18} />, type: Tools.AI },
+    { icon: <GiFallingStar size={18} />, type: Tools.AI, label: "AI" },
   ];
 
   const fillStyles = [
@@ -191,10 +191,12 @@ export function Canvas({
             key={tool.type}
             onClick={() => changeTool(tool.type)}
             isSelected={tool.type === currentState?.tool}
+            label={tool.label}
           >
             {tool.icon}
           </ToolbarButton>
         ))}
+
         {currentState.showDelete && (
           <ToolbarButton onClick={() => game?.deleteShape()}>
             <AiTwotoneDelete size={18} />
@@ -235,17 +237,24 @@ function ToolbarButton({
   children,
   isSelected,
   onClick,
+  label,
 }: {
   children: React.ReactNode;
   isSelected?: boolean;
   onClick: () => void;
+  label?: string;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`${isSelected ? "bg-primary text-white" : "hover:bg-primary/30"} p-1 md:p-2 rounded-md `}
+      className={`${isSelected ? "bg-primary text-white" : "hover:bg-primary/30"} p-1 md:p-3 rounded-md relative`}
     >
       {children}
+      {label && (
+        <p className="font-mono absolute right-0 bottom-0 rounded-sm px-1 text-white bg-primary text-[9px]">
+          {label}
+        </p>
+      )}
     </button>
   );
 }

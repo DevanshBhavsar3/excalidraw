@@ -1,9 +1,5 @@
 import { JWT_SECRET } from "@repo/backend-common/config";
-import {
-  CreateRoomSchema,
-  CreateUserSchema,
-  SigninUserSchema,
-} from "@repo/common/types";
+import { CreateRoomSchema, UserSchema } from "@repo/common/types";
 import { prisma } from "@repo/db/client";
 import bcrypt from "bcrypt";
 import express from "express";
@@ -19,7 +15,7 @@ app.use(express.json());
 app.use(cors());
 
 app.post("/signup", async (req, res) => {
-  const parsedBody = CreateUserSchema.safeParse(req.body);
+  const parsedBody = UserSchema.safeParse(req.body);
 
   if (!parsedBody.success) {
     res.status(400).json({ error: "Invalid Username or Password." });
@@ -46,7 +42,7 @@ app.post("/signup", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const parsedBody = SigninUserSchema.safeParse(req.body);
+  const parsedBody = UserSchema.safeParse(req.body);
 
   if (!parsedBody.success) {
     res.status(400).json({ error: "Invalid Username or Password." });

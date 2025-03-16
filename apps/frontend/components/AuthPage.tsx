@@ -8,6 +8,7 @@ import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { UserSchema } from "@repo/common/types";
 
 export function AuthPage({ page }: { page: "signup" | "login" }) {
   const router = useRouter();
@@ -18,10 +19,20 @@ export function AuthPage({ page }: { page: "signup" | "login" }) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
+    const parsedBody = UserSchema.safeParse({
+      username: usernameRef.current,
+      password: passwordRef.current,
+    });
+
+    if (!parsedBody.success) {
+      setError(parsedBody.error.errors[0].message);
+      return;
+    }
+
     try {
       const response = await axios.post(`${HTTP_URL}/${page}`, {
-        username: usernameRef.current,
-        password: passwordRef.current,
+        username: parsedBody.data.username,
+        password: parsedBody.data.password,
       });
 
       localStorage.setItem("token", response.data.token);

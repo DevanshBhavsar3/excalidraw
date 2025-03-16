@@ -18,6 +18,7 @@
     "roughjs": "^4.6.6"
   },
   "devDependencies": {
+    "@repo/common": "workspace:*",
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
