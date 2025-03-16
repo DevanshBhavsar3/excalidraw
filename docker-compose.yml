@@ -6,6 +6,15 @@ services:
     ports:
       - 5432:5432
     
+  db-migration:
+    build:
+      context: .
+      dockerfile: ./Docker/Dockerfile.migration
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      - postgres
+      
   frontend:
     build:
       context: .

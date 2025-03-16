@@ -22,15 +22,11 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Docker/Dockerfile.frontend
-          build-args: |
-            HTTP_URL=http://drawify.devanshbhavsar.tech:3000
-            WS_URL=ws://drawify.devanshbhavsar.tech:8080
-          add-hosts: localhost:host-gateway
+          file: ./Docker/Dockerfile.migration
           push: true
           tags: |
-            devanshbhavsar/drawify-frontend:latest
-            devanshbhavsar/drawify-frontend:${{ github.sha }}
+            devanshbhavsar/drawify-migration:latest
+            devanshbhavsar/drawify-migration:${{ github.sha }}
 
       - name: running docker container on vm
         uses: appleboy/ssh-action@v1.2.1
@@ -40,8 +36,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            docker stop frontend-app || true
-            docker rm frontend-app || true
-            docker image prune -f
-            docker pull devanshbhavsar/drawify-frontend:latest
-            docker run -d -p 3000:3000 --name frontend-app --add-host=localhost:host-gateway -e DATABASE_URL=${{secrets.DATABASE_URL}} devanshbhavsar/drawify-frontend:latest
+            docker run --rm -e DATABASE_URL=${{ secrets.DATABASE_URL }} devanshbhavsar/drawify-migration:latest

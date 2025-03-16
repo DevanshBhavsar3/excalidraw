@@ -24,7 +24,9 @@ jobs:
           context: .
           file: ./Docker/Dockerfile.http-backend
           push: true
-          tags: devanshbhavsar/drawify-http-backend:${{ github.sha }}
+          tags: |
+            devanshbhavsar/drawify-http-backend:latest
+            devanshbhavsar/drawify-http-backend:${{ github.sha }}
 
       - name: running docker container on vm
         uses: appleboy/ssh-action@v1.2.1
@@ -34,5 +36,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            docker pull devanshbhavsar/drawify-http-backend:${{ github.sha }}
-            docker run -d -p 3001:3001 -e DATABASE_URL=${{secrets.DATABASE_URL}} -e GEN_AI_API_KEY=${{secrets.GEN_AI_API_KEY}} devanshbhavsar/drawify-http-backend:${{ github.sha }}
+            docker stop http-backend || true
+            docker rm http-backend || true
+            docker image prune -f
+            docker pull devanshbhavsar/drawify-http-backend:latest
+            docker run -d -p 3001:3001 --name http-backend -e DATABASE_URL=${{secrets.DATABASE_URL}} -e GEN_AI_API_KEY=${{secrets.GEN_AI_API_KEY}} devanshbhavsar/drawify-http-backend:latest
