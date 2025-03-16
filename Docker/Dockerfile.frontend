@@ -4,12 +4,6 @@ WORKDIR /src
 
 RUN npm i -g pnpm
 
-ARG HTTP_URL
-ARG WS_URL
-
-ENV NEXT_PUBLIC_HTTP_URL=${HTTP_URL}
-ENV NEXT_PUBLIC_WEBSOCKET_URL=${WS_URL}
-
 COPY ./packages ./packages
 COPY ./package.json ./pnpm-lock.yaml ./pnpm-workspace.yaml ./turbo.json ./
 COPY ./apps/frontend/package.json ./apps/frontend/package.json

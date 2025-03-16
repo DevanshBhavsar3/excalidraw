@@ -14,16 +14,11 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - postgres
-      
+
   frontend:
     build:
       context: .
       dockerfile: ./Docker/Dockerfile.frontend
-      args:
-        - HTTP_URL=http://localhost:3001
-        - WS_URL=ws://localhost:8080
-    extra_hosts:
-      - "localhost:host-gateway"
     ports:
       - 3000:3000
     depends_on:
