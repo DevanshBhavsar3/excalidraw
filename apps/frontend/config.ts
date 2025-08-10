@@ -5,5 +5,5 @@ export const HTTP_URL =
 
 export const WS_URL =
   process.env.NODE_ENV === "production"
-    ? "https://drawifyws.devanshbhavsar.tech"
+    ? "https://excalidraw-http-q8az.onrender.com"
     : "ws://localhost:8080";
