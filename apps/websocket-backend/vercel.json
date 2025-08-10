@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && npx turbo run build --scope=websocket-backend --include-dependencies --no-deps"
+  "buildCommand": "cd ../.. && npx turbo run websocket-backend#build"
 }
